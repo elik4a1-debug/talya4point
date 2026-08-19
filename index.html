@@ -1,0 +1,2123 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מ-3 יחידות ל-4 יחידות | אפליקציית תרגול</title>
+<style>
+  :root{
+    --bg:#f5f7fb;
+    --card-bg:#ffffff;
+    --text:#1e2433;
+    --text-dim:#5b6472;
+    --primary:#3457d5;
+    --primary-dark:#2540a8;
+    --green:#1f9d63;
+    --green-bg:#e6f6ee;
+    --amber:#b8790a;
+    --amber-bg:#fdf3e0;
+    --red:#c0392b;
+    --red-bg:#fbeae8;
+    --gray:#8a93a3;
+    --gray-bg:#eef0f4;
+    --border:#e1e5ee;
+    --shadow: 0 2px 10px rgba(30,36,51,0.06), 0 1px 2px rgba(30,36,51,0.08);
+    --radius:14px;
+    --accent-indigo:#4f46e5;
+    --accent-teal:#0d9488;
+    --accent-magenta:#be185d;
+    --accent-cyan:#0891b2;
+    --accent-slate:#475569;
+    --accent-lime:#65a30d;
+    --accent-purple:#9333ea;
+    --accent-sky:#0284c7;
+    --accent-orange:#c2410c;
+    --accent-rose:#e11d48;
+    --accent-brown:#78350f;
+  }
+  @keyframes fadeSlideIn{
+    from{opacity:0; transform:translateY(6px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  @keyframes popIn{
+    0%{transform:scale(0.94); opacity:0;}
+    60%{transform:scale(1.015);}
+    100%{transform:scale(1); opacity:1;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;}
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family: "Segoe UI", Arial, Tahoma, sans-serif;
+    line-height:1.55;
+    min-height:100vh;
+  }
+  #app{max-width:960px;margin:0 auto;padding:20px 16px 60px;}
+  h1,h2,h3{line-height:1.3;margin:0 0 8px;}
+  h1{font-size:1.5rem;}
+  h2{font-size:1.25rem;}
+  h3{font-size:1.05rem;}
+  p{margin:0 0 12px;}
+  a{color:var(--primary);}
+  button{
+    font-family:inherit;
+    cursor:pointer;
+    border:none;
+    border-radius:10px;
+    padding:10px 18px;
+    font-size:0.95rem;
+    font-weight:600;
+    transition:transform .05s ease, opacity .15s ease;
+  }
+  button:active{transform:scale(0.97);}
+  button:disabled{opacity:.5;cursor:not-allowed;}
+  button svg{width:16px;height:16px;vertical-align:-3px;margin-inline-end:5px;}
+  .btn-primary{background:var(--primary);color:#fff;}
+  .btn-primary:hover{background:var(--primary-dark);}
+  .btn-secondary{background:var(--gray-bg);color:var(--text);}
+  .btn-secondary:hover{background:#e2e6ee;}
+  .btn-ghost{background:transparent;color:var(--primary);padding:8px 10px;}
+  .btn-danger{background:var(--red-bg);color:var(--red);}
+  .btn-block{width:100%;}
+  .row{display:flex;gap:10px;flex-wrap:wrap;}
+  .row.between{justify-content:space-between;align-items:center;}
+
+  header.top{
+    display:flex;justify-content:space-between;align-items:flex-start;
+    margin-bottom:20px;gap:12px;flex-wrap:wrap;
+  }
+  header.top .title-block{flex:1;min-width:220px;}
+  .subtitle{color:var(--text-dim);font-size:0.92rem;}
+
+  .card{
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:18px;
+    margin-bottom:16px;
+  }
+
+  .hero-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+  @media (max-width:560px){.hero-actions{grid-template-columns:1fr;}}
+  .hero-btn{
+    background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:18px; text-align:right; cursor:pointer;
+    display:flex; flex-direction:column; align-items:flex-start; gap:10px;
+    transition:border-color .15s ease, transform .1s ease;
+  }
+  .hero-btn:hover{border-color:var(--icon-color, var(--primary)); transform:translateY(-1px);}
+  .icon-chip{
+    width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    background:var(--icon-bg, var(--gray-bg)); color:var(--icon-color, var(--primary)); flex-shrink:0;
+  }
+  .icon-chip svg{width:22px;height:22px;}
+  .hero-btn h3{color:var(--text);margin:0 0 4px;}
+  .hero-btn p{color:var(--text-dim);font-size:0.88rem;margin:0;}
+
+  .topics-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media (max-width:640px){.topics-grid{grid-template-columns:1fr;}}
+
+  .topic-card{
+    background:var(--card-bg);border:1px solid var(--border);border-inline-start:4px solid var(--icon-color, var(--border));
+    border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:16px; cursor:pointer; position:relative;
+    transition:transform .12s ease, box-shadow .12s ease;
+    display:flex; gap:12px; align-items:flex-start;
+  }
+  .topic-card:hover{transform:translateY(-2px); box-shadow:0 6px 18px rgba(30,36,51,0.1);}
+  .topic-card.locked{opacity:.55;cursor:default;}
+  .topic-card.locked:hover{transform:none; box-shadow:var(--shadow);}
+  .topic-card .icon-chip{width:38px;height:38px;border-radius:10px;}
+  .topic-card .icon-chip svg{width:19px;height:19px;}
+  .topic-card-body{flex:1;min-width:0;}
+  .topic-week{font-size:0.72rem;color:var(--icon-color, var(--primary));font-weight:700;letter-spacing:.02em;text-transform:uppercase;margin-bottom:4px;}
+  .status-badge{
+    display:inline-block;font-size:0.74rem;font-weight:700;padding:3px 9px;border-radius:999px;margin-top:8px;
+  }
+  .status-not-started{background:var(--gray-bg);color:var(--gray);}
+  .status-in-progress{background:var(--amber-bg);color:var(--amber);}
+  .status-mastered{background:var(--green-bg);color:var(--green);}
+  .status-soon{background:var(--gray-bg);color:var(--gray);}
+
+  .score-pill{font-size:0.8rem;color:var(--text-dim);margin-top:6px;}
+
+  .breadcrumb{font-size:0.85rem;color:var(--text-dim);margin-bottom:10px;cursor:pointer;}
+  .breadcrumb span{color:var(--primary);cursor:pointer;}
+
+  .explain-block{background:var(--gray-bg);border-radius:10px;padding:14px 16px;margin:12px 0;}
+  .explain-block h4{margin:0 0 6px;font-size:0.95rem;}
+  .formula{
+    background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 14px;
+    font-family: "Cambria Math", Cambria, Georgia, serif; direction:ltr; text-align:center; margin:8px 0;
+  }
+  .video-links a{display:block;margin-bottom:6px;font-size:0.9rem;}
+  .mistakes-list li{margin-bottom:6px;}
+
+  .progress-bar-outer{background:var(--gray-bg);border-radius:999px;height:8px;overflow:hidden;margin-top:8px;}
+  .progress-bar-inner{background:var(--primary);height:100%;}
+
+  .quiz-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:0.85rem;color:var(--text-dim);}
+  .quiz-progress-outer{background:var(--gray-bg);border-radius:999px;height:6px;overflow:hidden;margin-bottom:18px;}
+  .quiz-progress-inner{background:var(--primary);height:100%;transition:width .2s ease;}
+
+  .question-stem{font-size:1.08rem;margin-bottom:16px;white-space:pre-wrap;}
+  .choices{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
+  .choice{
+    border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;background:#fff;
+    font-size:0.96rem; transition:border-color .12s ease, background-color .12s ease, transform .08s ease;
+  }
+  .choice:hover{border-color:var(--primary); transform:translateX(-2px);}
+  .choice.selected{border-color:var(--primary);background:#eef1fd;}
+  .choice.correct{border-color:var(--green);background:var(--green-bg); animation:popIn .25s ease;}
+  .choice.incorrect{border-color:var(--red);background:var(--red-bg);}
+
+  .numeric-input-row{display:flex;gap:10px;align-items:center;margin-bottom:14px;}
+  .numeric-input-row input{
+    flex:1;padding:12px 14px;font-size:1rem;border:1.5px solid var(--border);border-radius:10px;
+    font-family:inherit; direction:ltr; text-align:center;
+  }
+  .numeric-input-row input:focus{outline:none;border-color:var(--primary);}
+
+  .feedback-box{border-radius:10px;padding:12px 14px;margin:10px 0;font-size:0.92rem;font-weight:600;animation:popIn .22s ease;}
+  .feedback-correct{background:var(--green-bg);color:var(--green);}
+  .feedback-incorrect{background:var(--red-bg);color:var(--red);}
+  .feedback-neutral{background:var(--gray-bg);color:var(--text-dim);}
+
+  .hint-box{background:var(--amber-bg);color:#7a5205;border-radius:10px;padding:12px 14px;margin-top:10px;font-size:0.9rem;white-space:pre-wrap;animation:fadeSlideIn .2s ease;}
+
+  .result-topic-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);}
+  .result-topic-row:last-child{border-bottom:none;}
+  .tag{font-size:0.75rem;font-weight:700;padding:3px 10px;border-radius:999px;}
+  .tag-strong{background:var(--green-bg);color:var(--green);}
+  .tag-medium{background:var(--amber-bg);color:var(--amber);}
+  .tag-weak{background:var(--red-bg);color:var(--red);}
+  .tag-none{background:var(--gray-bg);color:var(--gray);}
+
+  .big-score{font-size:2.6rem;font-weight:800;color:var(--primary);text-align:center;margin:6px 0;}
+  .big-score-sub{text-align:center;color:var(--text-dim);margin-bottom:18px;}
+
+  footer.app-footer{margin-top:30px;text-align:center;color:var(--text-dim);font-size:0.8rem;}
+
+  .empty-state{text-align:center;color:var(--text-dim);padding:30px 10px;}
+
+  .toast{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    background:#1e2433;color:#fff;padding:10px 20px;border-radius:999px;font-size:0.88rem;
+    box-shadow:var(--shadow); z-index:50; opacity:0; pointer-events:none; transition:opacity .25s ease;
+  }
+  .toast.show{opacity:1;}
+
+  svg.chart{width:100%;height:auto;}
+
+  #app.view-fade{animation:fadeSlideIn .22s ease;}
+
+  .stat-strip{
+    display:flex; gap:16px; background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:16px 18px; margin-bottom:20px; align-items:center; flex-wrap:wrap;
+  }
+  .stat-ring{position:relative; width:56px;height:56px;flex-shrink:0;}
+  .stat-ring svg{width:56px;height:56px;transform:rotate(-90deg);}
+  .stat-ring-label{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-size:0.78rem; font-weight:800; color:var(--text);
+  }
+  .stat-strip-text{flex:1;min-width:160px;}
+  .stat-strip-text .stat-headline{font-weight:700;font-size:0.98rem;margin-bottom:2px;}
+  .stat-strip-text .stat-sub{color:var(--text-dim);font-size:0.84rem;}
+  .stat-mini-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:0.78rem;color:var(--text-dim);}
+  .stat-mini-legend span{display:inline-flex;align-items:center;gap:4px;}
+  .stat-mini-dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<input type="file" id="importFileInput" accept=".json" style="display:none;">
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ======================= Storage ======================= */
+var STORAGE_KEY = "talya_4_yechidot_v1";
+
+function loadData(){
+  try{
+    var raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultData();
+    var parsed = JSON.parse(raw);
+    if(!parsed || typeof parsed !== "object") return defaultData();
+    return Object.assign(defaultData(), parsed);
+  }catch(e){
+    console.warn("שגיאה בטעינת נתונים שמורים, מתחילים מנתונים ריקים.", e);
+    return defaultData();
+  }
+}
+
+function defaultData(){
+  return {
+    version: 1,
+    topics: {},        // topicId -> {attempts:[{date,score,total}], practiceCount}
+    diagnosticRuns: [], // {date, overallScore, perTopic:{topicId:{correct,total}}}
+    readinessRuns: []
+  };
+}
+
+var DATA = loadData();
+
+function saveData(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA));
+  }catch(e){
+    showToast("שגיאה בשמירת נתונים (אולי אין מקום פנוי בדפדפן)");
+    console.error(e);
+  }
+}
+
+function ensureTopic(topicId){
+  if(!DATA.topics[topicId]){
+    DATA.topics[topicId] = {attempts: [], practiceCount: 0};
+  }
+  return DATA.topics[topicId];
+}
+
+function recordTopicAttempt(topicId, correct, total, dontKnow){
+  var t = ensureTopic(topicId);
+  t.attempts.push({date: new Date().toISOString(), correct: correct, total: total, dontKnow: dontKnow||0});
+  saveData();
+}
+
+function recordPractice(topicId){
+  var t = ensureTopic(topicId);
+  t.practiceCount = (t.practiceCount||0) + 1;
+  saveData();
+}
+
+function topicStatus(topicId){
+  var t = DATA.topics[topicId];
+  if(!t || t.attempts.length === 0) return "not-started";
+  var last = t.attempts[t.attempts.length-1];
+  var pct = last.total ? (last.correct/last.total) : 0;
+  if(pct >= 0.8) return "mastered";
+  return "in-progress";
+}
+
+function topicLastScoreLabel(topicId){
+  var t = DATA.topics[topicId];
+  if(!t || t.attempts.length === 0) return null;
+  var last = t.attempts[t.attempts.length-1];
+  return Math.round((last.correct/last.total)*100) + "%";
+}
+
+function exportData(){
+  var blob = new Blob([JSON.stringify(DATA, null, 2)], {type:"application/json"});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  var dateStr = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = "גיבוי-התקדמות-" + dateStr + ".json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(url);}, 1000);
+  showToast("קובץ הגיבוי הורד בהצלחה");
+}
+
+function importDataFromFile(file){
+  var reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      var parsed = JSON.parse(e.target.result);
+      if(!parsed || typeof parsed !== "object" || !parsed.topics){
+        throw new Error("invalid file");
+      }
+      DATA = Object.assign(defaultData(), parsed);
+      saveData();
+      showToast("הנתונים יובאו בהצלחה");
+      state.view = "dashboard";
+      render();
+    }catch(err){
+      showToast("הקובץ שנבחר אינו קובץ גיבוי תקין");
+      console.error(err);
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* ======================= Utilities ======================= */
+function randInt(min, max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function randNonZero(min, max){ var v; do{ v = randInt(min,max);}while(v===0); return v; }
+function pick(arr){ return arr[randInt(0, arr.length-1)]; }
+function shuffle(arr){
+  var a = arr.slice();
+  for(var i=a.length-1;i>0;i--){
+    var j = randInt(0,i);
+    var tmp=a[i]; a[i]=a[j]; a[j]=tmp;
+  }
+  return a;
+}
+function fmtNum(n){
+  if(Math.abs(n - Math.round(n)) < 1e-9) return String(Math.round(n));
+  return String(Math.round(n*100)/100);
+}
+function fmtCoeffTerm(coeff, varPart, isFirst){
+  // builds a term like "+3x^2" or "-x" with proper sign spacing for a polynomial string (LTR math)
+  if(coeff === 0) return "";
+  var sign = coeff < 0 ? " - " : (isFirst ? "" : " + ");
+  var abs = Math.abs(coeff);
+  var coeffStr = (abs === 1 && varPart) ? "" : fmtNum(abs);
+  return sign + coeffStr + varPart;
+}
+function polyString(terms){
+  // terms: array of [coeff, varPart] highest degree first
+  var out = "";
+  var first = true;
+  terms.forEach(function(t){
+    if(t[0] === 0) return;
+    out += fmtCoeffTerm(t[0], t[1], first);
+    first = false;
+  });
+  if(out === "") out = "0";
+  return out.trim();
+}
+function factorial(n){
+  var r = 1;
+  for(var i=2;i<=n;i++) r *= i;
+  return r;
+}
+function nCr(n,k){ return Math.round(factorial(n)/(factorial(k)*factorial(n-k))); }
+function nPr(n,k){ return Math.round(factorial(n)/factorial(n-k)); }
+function checkNumeric(userVal, correct, tolerance){
+  if(userVal === null || userVal === undefined || userVal === "") return false;
+  var n = parseFloat(String(userVal).replace(",", "."));
+  if(isNaN(n)) return false;
+  tolerance = tolerance === undefined ? 0.05 : tolerance;
+  return Math.abs(n - correct) <= tolerance + Math.abs(correct)*0.01;
+}
+
+function showToast(msg){
+  var el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(function(){ el.classList.remove("show"); }, 2600);
+}
+
+/* ======================= Icons ======================= */
+function svgIcon(inner){
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg>';
+}
+var ICONS = {
+  derivatives: '<path d="M3 17c4 0 5-11 9-11s4 9 9 6"/><path d="M6.5 14.2 17.5 9.3" stroke-dasharray="2.2 2.2"/>',
+  functionAnalysis: '<path d="M3 16c4 0 5-10 9-10s5 10 9 10"/><circle cx="12" cy="6" r="1.5" fill="currentColor" stroke="none"/>',
+  sequences: '<path d="M5 17 10 13 15 9 20 5" stroke-dasharray="1 3.4"/><circle cx="5" cy="17" r="1.5" fill="currentColor" stroke="none"/><circle cx="10" cy="13" r="1.5" fill="currentColor" stroke="none"/><circle cx="15" cy="9" r="1.5" fill="currentColor" stroke="none"/><circle cx="20" cy="5" r="1.5" fill="currentColor" stroke="none"/>',
+  trig: '<circle cx="12" cy="12" r="8"/><path d="M12 12h8"/><path d="M12 12 17 6.2"/>',
+  integral: '<path d="M4 6.5c3 0 3 11 6 11s3-11 6-11"/><path d="M4 18h16" stroke-dasharray="1 3"/>',
+  compass: '<circle cx="12" cy="12" r="9"/><path d="M15.2 8.8 13 13l-4.2 2.2L11 11l4.2-2.2z" fill="currentColor" stroke="none"/>',
+  target: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.4"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/>',
+  clock: '<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>',
+  chart: '<path d="M4 19V5"/><path d="M4 19h16"/><path d="M7 16v-4"/><path d="M11.5 16V8"/><path d="M16 16v-7"/>',
+  download: '<path d="M12 4v11"/><path d="M7.5 11 12 15.5 16.5 11"/><path d="M4.5 19h15"/>',
+  upload: '<path d="M12 20V9"/><path d="M7.5 13 12 8.5 16.5 13"/><path d="M4.5 20h15"/>',
+  brackets: '<path d="M9 4c-2 0-3 1-3 3v10c0 2-1 3-3 3"/><path d="M9 4c2 0 3 1 3 3v10c0 2 1 3 3 3" transform="translate(6,0)"/>',
+  growth: '<path d="M4 18c2 0 3-1 4-3s2-8 6-8 4 6 6 9"/>',
+  vector: '<path d="M4 20V4"/><path d="M4 20h16"/><path d="M5 19 15 7"/><path d="M15 7h-4"/><path d="M15 7v4"/>',
+  cube: '<path d="M12 3 20 7.5V16.5L12 21 4 16.5V7.5L12 3Z"/><path d="M12 3V12"/><path d="M4 7.5 12 12"/><path d="M20 7.5 12 12"/>',
+  dice: '<rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="9" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="9" cy="15" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="15" r="1.2" fill="currentColor" stroke="none"/>',
+  bell: '<path d="M4 18h16"/><path d="M4 18c2-0.4 3-1 4-3 1.5-3 2-9 4-9s2.5 6 4 9c1 2 2 2.6 4 3"/>'
+};
+function topicIconChip(t, sizeClass){
+  var color = t.accent || "var(--gray)";
+  var bg = t.accentBg || "var(--gray-bg)";
+  var inner = t.active ? (ICONS[t.iconKey] || ICONS.chart) : ICONS.clock;
+  return '<div class="icon-chip" style="--icon-color:' + color + ';--icon-bg:' + bg + ';">' + svgIcon(inner) + '</div>';
+}
+
+/* ======================= Topics data ======================= */
+var TOPICS = [
+  {
+    id: "derivatives-basics",
+    week: "שבוע 1",
+    title: "יסודות הנגזרת",
+    short: "מושג הנגזרת, כללי גזירה בסיסיים, משוואת משיק, עלייה וירידה",
+    active: true,
+    accent: "var(--accent-indigo)", accentBg: "#eeecfc", iconKey: "derivatives",
+    explain: {
+      whatIsIt: "הנגזרת של פונקציה בנקודה מודדת את קצב השינוי שלה — במילים אחרות, את שיפוע המשיק לגרף באותה נקודה. אם f יורדת, הנגזרת שלילית; אם f עולה, הנגזרת חיובית.",
+      formulas: [
+        "אם f(x) = x^n אז f'(x) = n·x^(n-1)",
+        "אם f(x) = c·g(x) אז f'(x) = c·g'(x)  (קבוע יוצא מחוץ לנגזרת)",
+        "אם f(x) = g(x) ± h(x) אז f'(x) = g'(x) ± h'(x)",
+        "משוואת משיק בנקודה x0: y - f(x0) = f'(x0)·(x - x0)"
+      ],
+      example: "לדוגמה: f(x) = 3x^2 - 4x + 5.\nf'(x) = 6x - 4.\nהשיפוע בנקודה x=2 הוא f'(2) = 6·2 - 4 = 8.",
+      mistakes: [
+        "לשכוח להוריד את המעריך בחזרה (כלומר לחשב n·x^n במקום n·x^(n-1))",
+        "לבלבל בין f(x0) (ערך הפונקציה) לבין f'(x0) (שיפוע המשיק) במשוואת המשיק",
+        "לשכוח שנגזרת של קבוע לבדו (בלי x) היא תמיד 0"
+      ]
+    },
+    videos: [
+      {label:"קמפוס IL — שאלון 481/804, נגזרות", url:"https://campus.gov.il/"},
+      {label:"יואל גבע (My Geva) — נגזרות בסיסיות", url:"https://www.youtube.com/@Yoelgevapublish"}
+    ]
+  },
+  {
+    id: "function-analysis",
+    week: "שבוע 2",
+    title: "חקירת פונקציות ואופטימיזציה",
+    short: "נקודות קיצון, תחומי עלייה/ירידה, חקירה מלאה, בעיות מקסימום/מינימום",
+    active: true,
+    accent: "var(--accent-teal)", accentBg: "#e2f5f3", iconKey: "functionAnalysis",
+    explain: {
+      whatIsIt: "חקירת פונקציה אומרת: למצוא איפה הפונקציה עולה/יורדת, איפה יש לה נקודות קיצון (מקסימום/מינימום מקומיים), ולשרטט את הגרף על סמך המידע הזה. הכלי המרכזי: סימן הנגזרת.",
+      formulas: [
+        "נקודות חשודות לקיצון: פתרון המשוואה f'(x) = 0",
+        "אם f' עוברת מ-חיובי לשלילי בנקודה — זו נקודת מקסימום מקומי",
+        "אם f' עוברת מ-שלילי לחיובי בנקודה — זו נקודת מינימום מקומי",
+        "בבעיית אופטימיזציה: מבטאים את הגודל שרוצים למקסם/למזער כפונקציה של משתנה אחד, גוזרים, ומשווים ל-0"
+      ],
+      example: "לדוגמה: f(x) = x^2 - 4x + 1.\nf'(x) = 2x - 4 = 0  ⟹  x = 2.\nמשמאל ל-2 הנגזרת שלילית (יורדת), מימין חיובית (עולה) ⟹ x=2 נקודת מינימום.",
+      mistakes: [
+        "לפתור f'(x)=0 ולעצור שם, בלי לבדוק אם זו נקודת מקסימום או מינימום (בעזרת סימן הנגזרת)",
+        "בבעיית אופטימיזציה מילולית — לשכוח לבטא הכול במשתנה אחד לפני הגזירה",
+        "לבלבל בין ערך ה-x של נקודת הקיצון לבין הערך המקסימלי/מינימלי עצמו f(x)"
+      ]
+    },
+    videos: [
+      {label:"קמפוס IL — חקירת פונקציות", url:"https://campus.gov.il/"},
+      {label:"Ovad Lev Ari — בעיות אופטימיזציה", url:"https://www.youtube.com/results?search_query=Ovad+Lev+Ari+%D7%90%D7%95%D7%A4%D7%98%D7%99%D7%9E%D7%99%D7%96%D7%A6%D7%99%D7%94"}
+    ]
+  },
+  {
+    id: "sequences",
+    week: "שבוע 3",
+    title: "סדרות",
+    short: "סדרה חשבונית והנדסית, נוסחת האיבר הכללי, סכום סדרה",
+    active: true,
+    accent: "var(--accent-magenta)", accentBg: "#fbe6f0", iconKey: "sequences",
+    explain: {
+      whatIsIt: "סדרה חשבונית: כל איבר שווה לקודם + הפרש קבוע d. סדרה הנדסית: כל איבר שווה לקודם כפול מנה קבועה q. יודעים לזהות איזו סדרה נתונה, ולחשב איבר כללי או סכום.",
+      formulas: [
+        "סדרה חשבונית: a_n = a1 + (n-1)·d",
+        "סכום סדרה חשבונית: S_n = n/2 · (2a1 + (n-1)d)",
+        "סדרה הנדסית: a_n = a1 · q^(n-1)",
+        "סכום סדרה הנדסית סופית: S_n = a1 · (q^n - 1)/(q - 1)   (עבור q ≠ 1)"
+      ],
+      example: "לדוגמה: סדרה חשבונית עם a1=3, d=4.\nהאיבר החמישי: a5 = 3 + 4·4 = 19.\nסכום 5 האיברים הראשונים: S5 = 5/2·(2·3+4·4) = 5/2·22 = 55.",
+      mistakes: [
+        "בנוסחת האיבר הכללי להשתמש ב-n במקום ב-(n-1) — טעות שכיחה מאוד",
+        "לבלבל בין d (הפרש, סדרה חשבונית) לבין q (מנה, סדרה הנדסית)",
+        "בסדרה הנדסית עם q=1 הנוסחה לסכום לא מוגדרת (חלוקה ב-0) — במקרה כזה S_n = n·a1"
+      ]
+    },
+    videos: [
+      {label:"קמפוס IL — סדרות חשבוניות והנדסיות", url:"https://campus.gov.il/"},
+      {label:"יואל גבע — סדרות", url:"https://www.youtube.com/@Yoelgevapublish"}
+    ]
+  },
+  {
+    id: "trig-extended",
+    week: "שבוע 4",
+    title: "טריגונומטריה מורחבת",
+    short: "מעגל היחידה, זוויות כלליות, משפט הסינוסים והקוסינוסים",
+    active: true,
+    accent: "var(--accent-cyan)", accentBg: "#e2f2f7", iconKey: "trig",
+    explain: {
+      whatIsIt: "בניגוד לתיכון היסודי (משולש ישר-זווית בלבד), כאן לומדים סינוס/קוסינוס/טנגנס גם לזוויות כלליות (מעל 90°) דרך מעגל היחידה, ופותרים משולש כללי (לא בהכרח ישר-זווית) עם משפט הסינוסים והקוסינוסים.",
+      formulas: [
+        "משפט הקוסינוסים: c² = a² + b² − 2ab·cos(C)",
+        "משפט הסינוסים: a/sin(A) = b/sin(B) = c/sin(C)",
+        "sin(180° − x) = sin(x)   וגם   cos(180° − x) = −cos(x)",
+        "טנגנס אינו מוגדר כאשר cos(x) = 0, כלומר בזוויות 90°, 270° וכו׳"
+      ],
+      example: "לדוגמה: משולש עם a=5, b=7, וזווית C=60° ביניהן.\nc² = 5² + 7² − 2·5·7·cos(60°) = 25+49−35 = 39\nc = √39 ≈ 6.24",
+      mistakes: [
+        "לשכוח שבזוויות קהות (מעל 90°) הקוסינוס שלילי — cos(120°) = −0.5 ולא +0.5",
+        "להשתמש במשפט הסינוסים כשלא נתונה זווית מול צלע ידועה — לפעמים חובה להתחיל דווקא במשפט הקוסינוסים",
+        "לשכוח יחידות זווית (מעלות) בסביבת חישוב שמצפה לרדיאנים"
+      ]
+    },
+    videos: [
+      {label:"קמפוס IL — טריגונומטריה מורחבת", url:"https://campus.gov.il/"},
+      {label:"יואל גבע — משפט הסינוסים והקוסינוסים", url:"https://www.youtube.com/@Yoelgevapublish"}
+    ]
+  },
+  {
+    id: "integral-basics",
+    week: "שבוע 4",
+    title: "אינטגרל בסיסי",
+    short: "פונקציה קדומה, אינטגרל מסוים, קשר לשטח מתחת לגרף (הכרות ראשונית)",
+    active: true,
+    accent: "var(--accent-slate)", accentBg: "#e9edf2", iconKey: "integral",
+    explain: {
+      whatIsIt: "אינטגרציה היא הפעולה ההפוכה לגזירה. פונקציה קדומה F(x) של f(x) מקיימת F'(x) = f(x). האינטגרל המסוים מחשב שטח מתחת לגרף בין שתי נקודות.",
+      formulas: [
+        "פונקציה קדומה של x^n (n ≠ −1): F(x) = x^(n+1)/(n+1) + C",
+        "אינטגרל מסוים: ∫ₐᵇ f(x)dx = F(b) − F(a)",
+        "האינטגרל המסוים של פונקציה אי-שלילית בקטע שווה לשטח שבין הגרף לציר ה-x"
+      ],
+      example: "לדוגמה: F(x) קדומה של f(x)=x² היא F(x)=x³/3.\n∫₀² x² dx = F(2) − F(0) = 8/3 − 0 = 8/3 ≈ 2.67",
+      mistakes: [
+        "לשכוח את +C בפונקציה הקדומה הכללית (גם אם לא תמיד נדרש באינטגרל מסוים)",
+        "לחשב F(b) − F(a) הפוך (כלומר F(a) − F(b))",
+        "להשתמש בנוסחת החזקה גם עבור n = −1 (שם היא לא תקפה)"
+      ]
+    },
+    videos: [
+      {label:"קמפוס IL — מבוא לאינטגרל", url:"https://campus.gov.il/"}
+    ]
+  },
+  {
+    id:"algebra-functions", week:null, title:"אלגברה ופונקציות מתקדמות",
+    short:"טרנספורמציות של גרפים (הזזות, מתיחות), תחום הגדרה של פונקציה רציונלית",
+    active:true, accent:"var(--accent-lime)", accentBg:"#eef6e0", iconKey:"brackets",
+    explain:{
+      whatIsIt:"טרנספורמציה היא שינוי צורני של גרף פונקציה: הזזה ימינה/שמאלה/למעלה/למטה, או מתיחה/כיווץ. פונקציה רציונלית היא שבר שבו יש x גם במכנה — וצריך לשים לב שהמכנה לא מתאפס.",
+      formulas:[
+        "הזזה אופקית ואנכית: g(x) = f(x − a) + b מזיז את הגרף a יחידות ימינה ו-b יחידות למעלה",
+        "מתיחה אנכית: g(x) = c·f(x) מותח את הגרף פי c בכיוון ה-y",
+        "תחום ההגדרה של f(x) = 1/(x − a) הוא כל x פרט ל-x = a (כי אז המכנה מתאפס)"
+      ],
+      example:"לדוגמה: f(x) = x². הפונקציה g(x) = (x − 3)² + 2 היא ההזזה של f ב-3 ימינה ו-2 למעלה.\nלכן קודקוד הפרבולה עובר מ-(0,0) אל (3,2).",
+      mistakes:[
+        "לבלבל בין כיוון ההזזה: (x − a) מזיז ימינה (לא שמאלה) כש-a חיובי",
+        "לשכוח לבדוק את תחום ההגדרה בפונקציה רציונלית — נקודה שבה המכנה מתאפס פשוט לא קיימת בגרף",
+        "לחשוב שמתיחה אנכית g(x)=c·f(x) משפיעה גם על ציר ה-x — היא משפיעה רק על גובה הגרף"
+      ]
+    },
+    videos:[
+      {label:"קמפוס IL — טרנספורמציות של פונקציות", url:"https://campus.gov.il/"},
+      {label:"יואל גבע — פונקציה רציונלית ותחום הגדרה", url:"https://www.youtube.com/@Yoelgevapublish"}
+    ]
+  },
+  {
+    id:"exp-log", week:null, title:"פונקציות מעריכיות ולוגריתמיות",
+    short:"פתרון משוואות מעריכיות ולוגריתמיות, בעיות גידול ודעיכה",
+    active:true, accent:"var(--accent-purple)", accentBg:"#f3e8fd", iconKey:"growth",
+    explain:{
+      whatIsIt:"פונקציה מעריכית היא פונקציה שבה המשתנה נמצא בחזקה, כמו f(x) = bˣ. הלוגריתם הוא הפעולה ההפוכה: log_b(x) עונה על השאלה 'באיזו חזקה צריך להעלות את b כדי לקבל x?'.",
+      formulas:[
+        "אם bˣ = bᵏ אז x = k (כשהבסיס b זהה בשני האגפים)",
+        "log_b(bᵏ) = k — ההגדרה הבסיסית של לוגריתם",
+        "אם log_b(x) = k אז x = bᵏ",
+        "נוסחת גידול/דעיכה: כמות לאחר t צעדים = כמות התחלתית × (יחס)^t"
+      ],
+      example:"לדוגמה: פתרו 3ˣ = 81.\nמכיוון ש-81 = 3⁴, מקבלים 3ˣ = 3⁴ ⟹ x = 4.",
+      mistakes:[
+        "לנסות 'להעביר אגף' את החזקה כמו במשוואה רגילה — חובה קודם להשוות בסיסים",
+        "לבלבל בין log_b(x) לבין b/x או x/b",
+        "בבעיית גידול/דעיכה לשכוח שדעיכה משתמשת ביחס קטן מ-1 (לדוגמה 0.5 ולא 1.5)"
+      ]
+    },
+    videos:[
+      {label:"קמפוס IL — פונקציות מעריכיות ולוגריתמיות", url:"https://campus.gov.il/"},
+      {label:"Ovad Lev Ari — משוואות מעריכיות", url:"https://www.youtube.com/results?search_query=Ovad+Lev+Ari+%D7%9E%D7%A9%D7%95%D7%90%D7%95%D7%AA+%D7%9E%D7%A2%D7%A8%D7%99%D7%9B%D7%99%D7%95%D7%AA"}
+    ]
+  },
+  {
+    id:"analytic-geometry", week:null, title:"גיאומטריה אנליטית ווקטורים",
+    short:"משוואת ישר, מרחק בין נקודות, שיפוע, וקטורים במישור",
+    active:true, accent:"var(--accent-sky)", accentBg:"#e0f2fe", iconKey:"vector",
+    explain:{
+      whatIsIt:"גיאומטריה אנליטית משלבת אלגברה וגיאומטריה: מתארים נקודות, ישרים ווקטורים במערכת צירים באמצעות מספרים ומשוואות, במקום רק שרטוט.",
+      formulas:[
+        "מרחק בין שתי נקודות: d = √[(x₂−x₁)² + (y₂−y₁)²]",
+        "שיפוע ישר דרך שתי נקודות: m = (y₂−y₁)/(x₂−x₁)",
+        "משוואת ישר (נקודה-שיפוע): y − y₀ = m(x − x₀)",
+        "גודל (אורך) וקטור v=(vₓ, v_y): |v| = √(vₓ² + v_y²)"
+      ],
+      example:"לדוגמה: מרחק בין הנקודות (1,2) ו-(4,6).\nd = √[(4−1)² + (6−2)²] = √[9+16] = √25 = 5.",
+      mistakes:[
+        "לשכוח את הסימן במינוס בנוסחת המרחק/השיפוע — לחשב (x₁−x₂) ו-(y₂−y₁) בסדר לא עקבי",
+        "לבלבל בין שיפוע (מספר) לבין משוואת הישר המלאה (שוויון)",
+        "לשכוח שאורך וקטור הוא תמיד אי-שלילי (זהו שורש ריבועי של סכום ריבועים)"
+      ]
+    },
+    videos:[
+      {label:"קמפוס IL — גיאומטריה אנליטית", url:"https://campus.gov.il/"},
+      {label:"יואל גבע — וקטורים במישור", url:"https://www.youtube.com/@Yoelgevapublish"}
+    ]
+  },
+  {
+    id:"space-geometry", week:null, title:"גיאומטריה של המרחב",
+    short:"נפחים ושטחי פנים — גליל, חרוט, כדור",
+    active:true, accent:"var(--accent-orange)", accentBg:"#fdece0", iconKey:"cube",
+    explain:{
+      whatIsIt:"גיאומטריה של המרחב עוסקת בגופים תלת-ממדיים: חישוב נפח (כמה מקום הגוף תופס) ושטח פנים (שטח כל המעטפת החיצונית שלו).",
+      formulas:[
+        "נפח גליל: V = πr²h",
+        "נפח חרוט: V = (1/3)πr²h",
+        "נפח כדור: V = (4/3)πr³",
+        "שטח פני כדור: S = 4πr²"
+      ],
+      example:"לדוגמה: גליל ברדיוס r=3 וגובה h=5.\nV = π·3²·5 = 45π ≈ 141.4",
+      mistakes:[
+        "לשכוח את המקדם 1/3 בנוסחת נפח החרוט (בלי המקדם זה נפח הגליל המתאים, לא החרוט)",
+        "לבלבל בין נפח (יחידות מעוקבות) לבין שטח פנים (יחידות רבועות)",
+        "לחשב עם קוטר במקום רדיוס — יש לוודא תמיד אם הנתון הוא רדיוס או קוטר"
+      ]
+    },
+    videos:[
+      {label:"קמפוס IL — גיאומטריה של המרחב", url:"https://campus.gov.il/"},
+      {label:"יואל גבע — נפחים ושטחי פנים", url:"https://www.youtube.com/@Yoelgevapublish"}
+    ]
+  },
+  {
+    id:"probability", week:null, title:"הסתברות וקומבינטוריקה",
+    short:"הסתברות בסיסית, קומבינציות ותמורות, מאורעות בלתי תלויים",
+    active:true, accent:"var(--accent-rose)", accentBg:"#fce4e8", iconKey:"dice",
+    explain:{
+      whatIsIt:"הסתברות מודדת סיכוי (מספר בין 0 ל-1). קומבינטוריקה עוזרת לספור כמה דרכים שונות יש לבחור/לסדר איברים — כלי הכרחי לחישוב הסתברויות במקרים מורכבים.",
+      formulas:[
+        "הסתברות בסיסית: P(מאורע) = (מספר תוצאות רצויות)/(מספר תוצאות אפשריות)",
+        "מאורעות בלתי תלויים: P(A ∩ B) = P(A)·P(B)",
+        "קומבינציה (בחירה ללא סדר): C(n,k) = n!/(k!·(n−k)!)",
+        "תמורה (סידור עם סדר חשוב): P(n,k) = n!/(n−k)!"
+      ],
+      example:"לדוגמה: בכיס יש 3 כדורים אדומים ו-5 כחולים.\nP(אדום) = 3/(3+5) = 3/8 = 0.375",
+      mistakes:[
+        "לחבר הסתברויות של מאורעות שאינם זרים בלי להפחית את החפיפה",
+        "לבלבל בין קומבינציה (הסדר לא משנה) לבין תמורה (הסדר כן משנה)",
+        "לשכוח שהסתברות תמיד בין 0 ל-1 — תוצאה מחוץ לטווח הזה מסמנת טעות בחישוב"
+      ]
+    },
+    videos:[
+      {label:"קמפוס IL — הסתברות וקומבינטוריקה", url:"https://campus.gov.il/"},
+      {label:"Ovad Lev Ari — עצי הסתברות", url:"https://www.youtube.com/results?search_query=Ovad+Lev+Ari+%D7%A2%D7%A6%D7%99+%D7%94%D7%A1%D7%AA%D7%91%D7%A8%D7%95%D7%AA"}
+    ]
+  },
+  {
+    id:"statistics", week:null, title:"סטטיסטיקה מתקדמת",
+    short:"מדדי מרכז ופיזור, ציון תקן (z), מקדם מתאם",
+    active:true, accent:"var(--accent-brown)", accentBg:"#f0e6df", iconKey:"bell",
+    explain:{
+      whatIsIt:"סטטיסטיקה מתארת ומנתחת נתונים: איפה 'המרכז' של הנתונים (ממוצע), כמה הם מפוזרים (טווח, סטיית תקן), וכיצד להשוות ערך בודד לשאר הקבוצה (ציון תקן).",
+      formulas:[
+        "ממוצע: x̄ = (סכום הערכים)/(מספר הערכים)",
+        "טווח: Range = הערך המקסימלי − הערך המינימלי",
+        "ציון תקן (z-score): z = (x − μ)/σ",
+        "מקדם המתאם (קורלציה) r נמצא תמיד בטווח שבין −1 ל-1"
+      ],
+      example:"לדוגמה: קבוצת ציונים 80, 85, 90, 75, 70.\nממוצע = (80+85+90+75+70)/5 = 400/5 = 80",
+      mistakes:[
+        "לחשב ממוצע ולשכוח לחלק במספר הערכים הנכון (לספור שוב את כמות הערכים)",
+        "לבלבל בין טווח (הפרש בין מקסימום למינימום) לבין סטיית תקן (מדד פיזור מדויק יותר)",
+        "לחשוב שמקדם מתאם r=0 אומר 'אין קשר בכלל' — הוא רק אומר שאין קשר ליניארי"
+      ]
+    },
+    videos:[
+      {label:"קמפוס IL — סטטיסטיקה מתקדמת", url:"https://campus.gov.il/"}
+    ]
+  }
+];
+
+function getTopic(id){
+  for(var i=0;i<TOPICS.length;i++) if(TOPICS[i].id===id) return TOPICS[i];
+  return null;
+}
+function activeTopics(){ return TOPICS.filter(function(t){return t.active;}); }
+
+/* ======================= Question generators ======================= */
+/* Each generator returns:
+   {topicId, type: 'mc'|'numeric', stem, choices?(array of strings), correctIndex?,
+    correctValue?, tolerance?, hints:[h1,h2,fullSolution]}
+*/
+
+var GENERATORS = {
+
+  "derivatives-basics": [
+    function genPolyDerivValue(){
+      var a = randNonZero(-6,6), b = randNonZero(-6,6), c = randInt(-5,5);
+      var x0 = randInt(-3,3);
+      var stem = "נתונה הפונקציה f(x) = " + polyString([[a,"x^2"],[b,"x"],[c,""]]) +
+                 ".\nמהו ערך הנגזרת f'(" + x0 + ") ?";
+      var deriv_a = 2*a, deriv_b = b;
+      var correct = deriv_a*x0 + deriv_b;
+      return {
+        topicId:"derivatives-basics", type:"numeric", stem:stem,
+        correctValue: correct, tolerance:0.01,
+        hints:[
+          "רמז 1: גזרו איבר-איבר. הנגזרת של x^2 היא 2x, והנגזרת של x היא 1.",
+          "רמז 2: מתקבל f'(x) = " + polyString([[deriv_a,"x"],[deriv_b,""]]) + ". הציבו x=" + x0 + ".",
+          "פתרון מלא:\nf'(x) = " + polyString([[deriv_a,"x"],[deriv_b,""]]) + "\nf'(" + x0 + ") = " + deriv_a + "·(" + x0 + ") + (" + deriv_b + ") = " + correct
+        ]
+      };
+    },
+    function genTangentSlope(){
+      var a = randNonZero(-4,4), b = randNonZero(-6,6), c = randInt(-5,5);
+      var x0 = randInt(-3,3);
+      var stem = "נתונה הפונקציה f(x) = " + polyString([[a,"x^2"],[b,"x"],[c,""]]) +
+                 ".\nמהו שיפוע המשיק לגרף הפונקציה בנקודה x = " + x0 + " ?";
+      var correct = 2*a*x0 + b;
+      return {
+        topicId:"derivatives-basics", type:"numeric", stem:stem,
+        correctValue: correct, tolerance:0.01,
+        hints:[
+          "רמז 1: שיפוע המשיק בנקודה שווה בדיוק לערך הנגזרת באותה נקודה.",
+          "רמז 2: חשבו קודם את f'(x), ואז הציבו x=" + x0 + ".",
+          "פתרון מלא:\nf'(x) = " + polyString([[2*a,"x"],[b,""]]) + "\nשיפוע = f'(" + x0 + ") = " + correct
+        ]
+      };
+    },
+    function genDerivRuleMC(){
+      var n = pick([2,3,4,5]);
+      var correctStr = n + "x^" + (n-1);
+      var distractors = [
+        n + "x^" + n,
+        (n-1) + "x^" + (n-1),
+        "x^" + (n-1)
+      ];
+      var choices = shuffle([correctStr].concat(distractors));
+      var correctIndex = choices.indexOf(correctStr);
+      return {
+        topicId:"derivatives-basics", type:"mc",
+        stem:"מהי הנגזרת של הפונקציה f(x) = x^" + n + " ?",
+        choices: choices, correctIndex: correctIndex,
+        hints:[
+          "רמז 1: כלל החזקה אומר שגוזרים x^n ומקבלים n כפול x בחזקה אחת פחות.",
+          "רמז 2: כלומר f'(x) = n·x^(n-1). הציבו n=" + n + ".",
+          "פתרון מלא: f'(x) = " + n + "·x^" + (n-1) + " = " + correctStr
+        ]
+      };
+    },
+    function genIncreasingDecreasing(){
+      var r1 = randInt(-4,-1), r2 = randInt(1,4);
+      // f'(x) = (x - r1)(x - r2), positive outside (r1,r2), negative inside
+      var stemChoicesCorrect = "הפונקציה יורדת בקטע (" + r1 + ", " + r2 + ") ועולה מחוץ לו";
+      var distractors = [
+        "הפונקציה עולה בקטע (" + r1 + ", " + r2 + ") ויורדת מחוץ לו",
+        "הפונקציה עולה בכל תחום ההגדרה",
+        "הפונקציה יורדת בכל תחום ההגדרה"
+      ];
+      var choices = shuffle([stemChoicesCorrect].concat(distractors));
+      var correctIndex = choices.indexOf(stemChoicesCorrect);
+      return {
+        topicId:"derivatives-basics", type:"mc",
+        stem:"ידוע כי f'(x) = (x - (" + r1 + "))·(x - (" + r2 + ")). מה ניתן לומר על תחומי העלייה והירידה של f?",
+        choices: choices, correctIndex: correctIndex,
+        hints:[
+          "רמז 1: מכפלה של שני גורמים חיובית כששני הגורמים באותו סימן, ושלילית כשהם בסימנים מנוגדים.",
+          "רמז 2: בדקו את סימן f'(x) בקטע שבין השורשים " + r1 + " ו-" + r2 + ", ומחוצה לו.",
+          "פתרון מלא: השורשים הם x=" + r1 + " ו-x=" + r2 + ". בין השורשים המכפלה שלילית (f יורדת), ומחוץ להם חיובית (f עולה)."
+        ]
+      };
+    }
+  ],
+
+  "function-analysis": [
+    function genVertexMin(){
+      var a = randNonZero(-4,4);
+      var bBase = randInt(-6,6);
+      var b = -2*a*bBase; // so that critical point x = bBase
+      var c = randInt(-5,5);
+      var stem = "נתונה הפונקציה f(x) = " + polyString([[a,"x^2"],[b,"x"],[c,""]]) +
+                 ".\nמהו ערך ה-x של נקודת הקיצון של f ?";
+      return {
+        topicId:"function-analysis", type:"numeric", stem:stem,
+        correctValue: bBase, tolerance:0.01,
+        hints:[
+          "רמז 1: חשבו את f'(x) והשוו ל-0.",
+          "רמז 2: f'(x) = " + polyString([[2*a,"x"],[b,""]]) + " = 0",
+          "פתרון מלא:\n" + polyString([[2*a,"x"],[b,""]]) + " = 0\nx = " + bBase
+        ]
+      };
+    },
+    function genMaxMinConcept(){
+      var correct = "נקודת מקסימום מקומי";
+      var choices = shuffle([correct, "נקודת מינימום מקומי", "נקודת פיתול בלבד, בלי קיצון", "אי אפשר לדעת בלי לחשב את f עצמה"]);
+      var correctIndex = choices.indexOf(correct);
+      return {
+        topicId:"function-analysis", type:"mc",
+        stem:"בנקודה x0 הנגזרת f'(x) עוברת מחיובית (משמאל) לשלילית (מימין). מה ניתן להסיק על הנקודה x0 ?",
+        choices: choices, correctIndex: correctIndex,
+        hints:[
+          "רמז 1: חיובי משמאל אומר שהפונקציה עולה לפני x0.",
+          "רמז 2: שלילי מימין אומר שהפונקציה יורדת אחרי x0 — עולה ואז יורדת.",
+          "פתרון מלא: עולה ואז יורדת = פסגה = נקודת מקסימום מקומי."
+        ]
+      };
+    },
+    function genOptimizationRectangle(){
+      var P = randInt(8,20) * 2; // even perimeter for clean numbers
+      var side = P/4;
+      var area = side*side;
+      var stem = "היקפו של מלבן הוא " + P + " ס\"מ. מהו השטח המקסימלי האפשרי של המלבן (בסמ\"ר)?\n(רמז: השטח מקסימלי כאשר המלבן הוא ריבוע)";
+      return {
+        topicId:"function-analysis", type:"numeric", stem:stem,
+        correctValue: area, tolerance:0.5,
+        hints:[
+          "רמז 1: אם הצלעות הן x ו-(P/2 - x), בטאו את השטח כפונקציה של x בלבד: A(x) = x·(P/2 - x).",
+          "רמז 2: גזרו את A(x) והשוו ל-0 כדי למצוא את x שמביא למקסימום.",
+          "פתרון מלא:\nA(x) = x(" + (P/2) + " - x) = " + (P/2) + "x - x²\nA'(x) = " + (P/2) + " - 2x = 0 ⟹ x = " + side + "\nA(" + side + ") = " + side + "² = " + area
+        ]
+      };
+    },
+    function genFullAnalysisRoots(){
+      var r1 = 0, r2 = randInt(2,6);
+      // f(x) = x(x-r2) = x^2 - r2 x, critical point at x = r2/2
+      var critX = r2/2;
+      var stem = "נתונה הפונקציה f(x) = x·(x - " + r2 + "). מצאו את ערך ה-x שבו f מקבלת ערך מינימלי.";
+      return {
+        topicId:"function-analysis", type:"numeric", stem:stem,
+        correctValue: critX, tolerance:0.05,
+        hints:[
+          "רמז 1: פתחו סוגריים: f(x) = x² - " + r2 + "x.",
+          "רמז 2: גזרו והשוו ל-0: f'(x) = 2x - " + r2 + " = 0.",
+          "פתרון מלא:\n2x = " + r2 + "\nx = " + critX
+        ]
+      };
+    }
+  ],
+
+  "sequences": [
+    function genArithmeticTerm(){
+      var a1 = randInt(-8,8), d = randNonZero(-6,6);
+      var n = randInt(4,9);
+      var correct = a1 + (n-1)*d;
+      return {
+        topicId:"sequences", type:"numeric",
+        stem:"בסדרה חשבונית, האיבר הראשון הוא a1 = " + a1 + " וההפרש d = " + d + ".\nמהו האיבר ה-" + n + " בסדרה?",
+        correctValue: correct, tolerance:0.01,
+        hints:[
+          "רמז 1: הנוסחה לאיבר הכללי בסדרה חשבונית היא a_n = a1 + (n-1)·d.",
+          "רמז 2: הציבו n=" + n + ", a1=" + a1 + ", d=" + d + ".",
+          "פתרון מלא:\na_" + n + " = " + a1 + " + (" + n + "-1)·(" + d + ") = " + correct
+        ]
+      };
+    },
+    function genGeometricTerm(){
+      var a1 = pick([2,3,4,5,-2,-3]);
+      var q = pick([2,3,-2,-3]);
+      var n = randInt(3,6);
+      var correct = a1 * Math.pow(q, n-1);
+      return {
+        topicId:"sequences", type:"numeric",
+        stem:"בסדרה הנדסית, האיבר הראשון הוא a1 = " + a1 + " והמנה q = " + q + ".\nמהו האיבר ה-" + n + " בסדרה?",
+        correctValue: correct, tolerance:0.5,
+        hints:[
+          "רמז 1: הנוסחה לאיבר הכללי בסדרה הנדסית היא a_n = a1 · q^(n-1).",
+          "רמז 2: הציבו n=" + n + ", a1=" + a1 + ", q=" + q + ".",
+          "פתרון מלא:\na_" + n + " = " + a1 + " · (" + q + ")^" + (n-1) + " = " + correct
+        ]
+      };
+    },
+    function genIdentifySequenceType(){
+      var isArith = Math.random() < 0.5;
+      var a1 = randInt(1,6);
+      var terms, correct;
+      if(isArith){
+        var d = randNonZero(-4,4);
+        terms = [a1, a1+d, a1+2*d, a1+3*d];
+        correct = "סדרה חשבונית";
+      }else{
+        var q = pick([2,3,-2]);
+        terms = [a1, a1*q, a1*q*q, a1*q*q*q];
+        correct = "סדרה הנדסית";
+      }
+      var choices = shuffle([correct, isArith ? "סדרה הנדסית" : "סדרה חשבונית", "לא ניתן לקבוע"]);
+      var correctIndex = choices.indexOf(correct);
+      return {
+        topicId:"sequences", type:"mc",
+        stem:"נתונה הסדרה: " + terms.join(", ") + ", ...\nמאיזה סוג הסדרה?",
+        choices: choices, correctIndex: correctIndex,
+        hints:[
+          "רמז 1: בדקו קודם אם ההפרש בין איברים עוקבים קבוע.",
+          "רמז 2: אם לא, בדקו אם המנה (יחס) בין איברים עוקבים קבועה.",
+          "פתרון מלא: " + (isArith ? ("ההפרש בין כל שני איברים עוקבים קבוע (" + (terms[1]-terms[0]) + ") ⟹ סדרה חשבונית.") : ("היחס בין כל שני איברים עוקבים קבוע (" + (terms[1]/terms[0]) + ") ⟹ סדרה הנדסית."))
+        ]
+      };
+    },
+    function genArithmeticSum(){
+      var a1 = randInt(-5,5), d = randNonZero(-5,5);
+      var n = randInt(4,10);
+      var correct = n/2*(2*a1+(n-1)*d);
+      return {
+        topicId:"sequences", type:"numeric",
+        stem:"בסדרה חשבונית a1=" + a1 + ", d=" + d + ". מהו סכום " + n + " האיברים הראשונים (S" + n + ")?",
+        correctValue: correct, tolerance:0.5,
+        hints:[
+          "רמז 1: נוסחת סכום סדרה חשבונית: S_n = n/2·(2a1 + (n-1)d).",
+          "רמז 2: הציבו n=" + n + ", a1=" + a1 + ", d=" + d + ".",
+          "פתרון מלא:\nS_" + n + " = " + n + "/2·(2·" + a1 + " + (" + n + "-1)·" + d + ") = " + correct
+        ]
+      };
+    },
+    function genGeometricSum(){
+      var a1 = pick([1,2,3]);
+      var q = pick([2,3]);
+      var n = randInt(3,5);
+      var correct = a1*(Math.pow(q,n)-1)/(q-1);
+      return {
+        topicId:"sequences", type:"numeric",
+        stem:"בסדרה הנדסית a1=" + a1 + ", q=" + q + ". מהו סכום " + n + " האיברים הראשונים (S" + n + ")?",
+        correctValue: correct, tolerance:1,
+        hints:[
+          "רמז 1: נוסחת סכום סדרה הנדסית סופית: S_n = a1·(q^n − 1)/(q − 1).",
+          "רמז 2: הציבו n=" + n + ", a1=" + a1 + ", q=" + q + ".",
+          "פתרון מלא:\nS_" + n + " = " + a1 + "·((" + q + ")^" + n + " − 1)/(" + q + " − 1) = " + correct
+        ]
+      };
+    }
+  ],
+
+  "trig-extended": [
+    function genUnitCircleValue(){
+      var table = [
+        {ang:0, sin:"0", cos:"1"},
+        {ang:30, sin:"1/2", cos:"√3/2"},
+        {ang:45, sin:"√2/2", cos:"√2/2"},
+        {ang:60, sin:"√3/2", cos:"1/2"},
+        {ang:90, sin:"1", cos:"0"},
+        {ang:120, sin:"√3/2", cos:"-1/2"},
+        {ang:135, sin:"√2/2", cos:"-√2/2"},
+        {ang:150, sin:"1/2", cos:"-√3/2"},
+        {ang:180, sin:"0", cos:"-1"}
+      ];
+      var row = pick(table);
+      var func = pick(["sin","cos"]);
+      var correct = func === "sin" ? row.sin : row.cos;
+      var allValues = ["0","1","-1","1/2","-1/2","√2/2","-√2/2","√3/2","-√3/2"];
+      var distractors = shuffle(allValues.filter(function(v){return v!==correct;})).slice(0,3);
+      var choices = shuffle([correct].concat(distractors));
+      var correctIndex = choices.indexOf(correct);
+      return {
+        topicId:"trig-extended", type:"mc",
+        stem:"מהו הערך של " + func + "(" + row.ang + "°) ?",
+        choices: choices, correctIndex: correctIndex,
+        hints:[
+          "רמז 1: השתמשו במעגל היחידה או בטבלת הערכים המיוחדים (0°, 30°, 45°, 60°, 90°...).",
+          "רמז 2: שימו לב אם הזווית ברביע השני (בין 90° ל-180°) — שם הקוסינוס שלילי אבל הסינוס עדיין חיובי.",
+          "פתרון מלא: " + func + "(" + row.ang + "°) = " + correct
+        ]
+      };
+    },
+    function genLawOfCosines(){
+      var a = randInt(3,9), b = randInt(3,9);
+      var angleOptions = [{deg:60, cos:0.5}, {deg:90, cos:0}, {deg:120, cos:-0.5}];
+      var chosen = pick(angleOptions);
+      var c2 = a*a + b*b - 2*a*b*chosen.cos;
+      var c = Math.sqrt(c2);
+      return {
+        topicId:"trig-extended", type:"numeric",
+        stem:"במשולש ABC נתון a=" + a + ", b=" + b + ", והזווית שביניהן C=" + chosen.deg + "°.\nמהו אורך הצלע c? (עגלו לשתי ספרות אחרי הנקודה)",
+        correctValue: c, tolerance:0.05,
+        hints:[
+          "רמז 1: השתמשו במשפט הקוסינוסים: c² = a² + b² − 2ab·cos(C).",
+          "רמז 2: cos(" + chosen.deg + "°) = " + chosen.cos + ". הציבו את הערכים.",
+          "פתרון מלא:\nc² = " + a + "² + " + b + "² − 2·" + a + "·" + b + "·(" + chosen.cos + ") = " + fmtNum(c2) + "\nc = √" + fmtNum(c2) + " ≈ " + fmtNum(c)
+        ]
+      };
+    },
+    function genLawOfSines(){
+      var A = pick([30,45,60]);
+      var B = pick([45,60,90].filter(function(x){return x!==A;}));
+      var sinVals = {30:0.5, 45:0.7071, 60:0.8660, 90:1};
+      var a = randInt(4,10);
+      var b = a * sinVals[B] / sinVals[A];
+      return {
+        topicId:"trig-extended", type:"numeric",
+        stem:"במשולש ABC נתון: הזווית A=" + A + "°, הזווית B=" + B + "°, והצלע a=" + a + " (מול הזווית A).\nמהו אורך הצלע b (מול הזווית B)? (עגלו לשתי ספרות אחרי הנקודה)",
+        correctValue: b, tolerance:0.1,
+        hints:[
+          "רמז 1: השתמשו במשפט הסינוסים: a/sin(A) = b/sin(B).",
+          "רמז 2: b = a·sin(B)/sin(A). הציבו sin(" + A + "°) ו-sin(" + B + "°).",
+          "פתרון מלא:\nb = " + a + "·sin(" + B + "°)/sin(" + A + "°) ≈ " + fmtNum(b)
+        ]
+      };
+    },
+    function genTangentDomainConcept(){
+      var correct = "בזוויות בהן cos(x) = 0, כמו 90° ו-270°";
+      var choices = shuffle([correct, "בזוויות בהן sin(x) = 0, כמו 0° ו-180°", "הטנגנס מוגדר בכל זווית ללא יוצא מן הכלל", "רק בזוויות שליליות"]);
+      var correctIndex = choices.indexOf(correct);
+      return {
+        topicId:"trig-extended", type:"mc",
+        stem:"tan(x) = sin(x)/cos(x). באילו זוויות הטנגנס אינו מוגדר?",
+        choices: choices, correctIndex: correctIndex,
+        hints:[
+          "רמז 1: פונקציה מוגדרת כל עוד אין חלוקה באפס.",
+          "רמז 2: tan(x) הוא מנה — בדקו מתי המכנה cos(x) מתאפס.",
+          "פתרון מלא: הטנגנס אינו מוגדר כאשר cos(x)=0, כלומר בזוויות 90°, 270° וכן הלאה."
+        ]
+      };
+    }
+  ],
+
+  "integral-basics": [
+    function genAntiderivativeConcept(){
+      var n = pick([2,3,4]);
+      var correct = "x^" + (n+1) + "/" + (n+1);
+      var distractors = [
+        (n+1) + "x^" + n,
+        "x^" + (n-1) + "/" + (n-1),
+        "x^" + n + "/" + n
+      ];
+      var choices = shuffle([correct].concat(distractors));
+      var correctIndex = choices.indexOf(correct);
+      return {
+        topicId:"integral-basics", type:"mc",
+        stem:"מהי הפונקציה הקדומה F(x) של f(x) = x^" + n + " ? (לא כולל קבוע האינטגרציה +C)",
+        choices: choices, correctIndex: correctIndex,
+        hints:[
+          "רמז 1: אינטגרציה היא הפעולה ההפוכה לגזירה — 'מעלים חזקה ומחלקים בה'.",
+          "רמז 2: F(x) = x^(n+1)/(n+1). הציבו n=" + n + ".",
+          "פתרון מלא: F(x) = x^" + (n+1) + "/" + (n+1)
+        ]
+      };
+    },
+    function genDefiniteIntegral(){
+      var n = pick([1,2]);
+      var a = randInt(2,4);
+      var correct = Math.pow(a, n+1)/(n+1);
+      return {
+        topicId:"integral-basics", type:"numeric",
+        stem:"חשבו את האינטגרל המסוים: ∫₀^" + a + " x^" + n + " dx  (עגלו לשתי ספרות אחרי הנקודה אם צריך)",
+        correctValue: correct, tolerance:0.05,
+        hints:[
+          "רמז 1: מצאו קודם פונקציה קדומה F(x) = x^(" + n + "+1)/(" + n + "+1).",
+          "רמז 2: חשבו F(" + a + ") − F(0).",
+          "פתרון מלא:\nF(x) = x^" + (n+1) + "/" + (n+1) + "\n∫₀^" + a + " = F(" + a + ") − F(0) = " + fmtNum(correct) + " − 0 = " + fmtNum(correct)
+        ]
+      };
+    },
+    function genAreaConcept(){
+      var correct = "נכון — האינטגרל המסוים של פונקציה אי-שלילית שווה לשטח שבין הגרף לציר ה-x";
+      var choices = shuffle([correct, "לא נכון — אין קשר בין אינטגרל לשטח", "נכון, אבל רק אם הפונקציה קווית (ישר)", "נכון, אבל רק אם תחום האינטגרציה שלילי"]);
+      var correctIndex = choices.indexOf(correct);
+      return {
+        topicId:"integral-basics", type:"mc",
+        stem:"נכון או לא נכון: האינטגרל המסוים ∫ₐᵇ f(x)dx של פונקציה אי-שלילית בקטע [a,b] מייצג את השטח שבין הגרף לציר ה-x בקטע הזה.",
+        choices: choices, correctIndex: correctIndex,
+        hints:[
+          "רמז 1: זו בדיוק המשמעות הגאומטרית שהוגדרה לאינטגרל המסוים.",
+          "רמז 2: התנאי 'אי-שלילית' חשוב — אם f שלילית בקטע, יתקבל שטח 'שלילי'.",
+          "פתרון מלא: נכון. זהו הקשר הבסיסי בין אינטגרל מסוים לשטח מתחת לגרף."
+        ]
+      };
+    }
+  ],
+
+  "algebra-functions": [
+    function genShiftMC(){
+      var a = randInt(1,5), b = randNonZero(-4,4);
+      var correct = "(x − " + a + ")² " + (b>=0? "+ " + b : "− " + Math.abs(b));
+      var d1 = "(x + " + a + ")² " + (b>=0? "+ " + b : "− " + Math.abs(b));
+      var d2 = "(x − " + a + ")² " + (b>=0? "− " + b : "+ " + Math.abs(b));
+      var d3 = "(x + " + a + ")² " + (b>=0? "− " + b : "+ " + Math.abs(b));
+      var choices = shuffle([correct,d1,d2,d3]);
+      var correctIndex = choices.indexOf(correct);
+      return {
+        topicId:"algebra-functions", type:"mc",
+        stem:"הגרף של g(x) מתקבל מהגרף של f(x)=x² על ידי הזזה של " + a + " יחידות ימינה ו-" + Math.abs(b) + " יחידות " + (b>=0?"למעלה":"למטה") + ". מהו הביטוי של g(x)?",
+        choices: choices, correctIndex: correctIndex,
+        hints:[
+          "רמז 1: הזזה ימינה ב-a יחידות פירושה להחליף את x ב-(x − a) בתוך הפונקציה.",
+          "רמז 2: הזזה אנכית פשוט מוסיפים/מחסירים קבוע מחוץ לפונקציה.",
+          "פתרון מלא: g(x) = " + correct
+        ]
+      };
+    },
+    function genShiftEval(){
+      var a = randInt(1,5), b = randInt(-4,4), x0 = randInt(-3,6);
+      var correct = Math.pow(x0-a,2) + b;
+      return {
+        topicId:"algebra-functions", type:"numeric",
+        stem:"נתונה f(x)=x², ו-g(x) = f(x − " + a + ") + (" + b + ").\nמהו הערך g(" + x0 + ") ?",
+        correctValue: correct, tolerance:0.01,
+        hints:[
+          "רמז 1: g(x) = (x − " + a + ")² + (" + b + ").",
+          "רמז 2: הציבו x=" + x0 + " בתוך הביטוי (x − " + a + ")² תחילה.",
+          "פתרון מלא:\ng(" + x0 + ") = (" + x0 + " − " + a + ")² + (" + b + ") = " + correct
+        ]
+      };
+    },
+    function genDomainMC(){
+      var a = randNonZero(-6,6);
+      var correct = "x = " + a;
+      var choices = shuffle([correct, "x = " + (-a), "x = 0", "x = " + (2*a)]);
+      var correctIndex = choices.indexOf(correct);
+      return {
+        topicId:"algebra-functions", type:"mc",
+        stem:"נתונה הפונקציה f(x) = 1/(x − (" + a + ")). איזה ערך x אינו בתחום ההגדרה של f?",
+        choices: choices, correctIndex: correctIndex,
+        hints:[
+          "רמז 1: תחום ההגדרה כולל את כל x פרט לערכים שמאפסים את המכנה.",
+          "רמז 2: פתרו x − (" + a + ") = 0.",
+          "פתרון מלא: x = " + a + " (כי אז המכנה מתאפס וההצבה אסורה)"
+        ]
+      };
+    },
+    function genStretchEval(){
+      var c = randNonZero(-4,4);
+      var v = randInt(-6,6);
+      var x0 = randInt(-5,5);
+      var correct = c*v;
+      return {
+        topicId:"algebra-functions", type:"numeric",
+        stem:"ידוע כי f(" + x0 + ") = " + v + ". נגדיר g(x) = " + c + "·f(x).\nמהו g(" + x0 + ") ?",
+        correctValue: correct, tolerance:0.01,
+        hints:[
+          "רמז 1: מתיחה אנכית פשוט מכפילה את ערך הפונקציה בקבוע.",
+          "רמז 2: g(" + x0 + ") = " + c + "·f(" + x0 + ") = " + c + "·(" + v + ")",
+          "פתרון מלא: g(" + x0 + ") = " + correct
+        ]
+      };
+    }
+  ],
+
+  "exp-log": [
+    function genExpSolve(){
+      var b = pick([2,3,5]);
+      var k = randInt(1,4);
+      var r = Math.pow(b,k);
+      return {
+        topicId:"exp-log", type:"numeric",
+        stem:"פתרו את המשוואה: " + b + "^x = " + r + "\nמהו x ?",
+        correctValue: k, tolerance:0.01,
+        hints:[
+          "רמז 1: כדי לפתור, כתבו את " + r + " כחזקה של " + b + ".",
+          "רמז 2: אם הבסיסים שווים משני צידי המשוואה, האורכים (החזקות) שווים.",
+          "פתרון מלא:\n" + r + " = " + b + "^" + k + "\n⟹ x = " + k
+        ]
+      };
+    },
+    function genLogDefMC(){
+      var k = randInt(2,6);
+      var correct = String(k);
+      var choices = shuffle([correct, "b^" + k, k + "^b", "1"]);
+      var correctIndex = choices.indexOf(correct);
+      return {
+        topicId:"exp-log", type:"mc",
+        stem:"מהו log_b(b^" + k + ") ?",
+        choices: choices, correctIndex: correctIndex,
+        hints:[
+          "רמז 1: log_b(x) שואל 'באיזו חזקה מעלים את b כדי לקבל x?'.",
+          "רמז 2: כאן x כבר כתוב כחזקה של b, אז התשובה היא החזקה עצמה.",
+          "פתרון מלא: log_b(b^" + k + ") = " + k
+        ]
+      };
+    },
+    function genGrowthDecay(){
+      var P0 = randInt(50,400);
+      var isGrowth = Math.random() < 0.5;
+      var r = isGrowth ? pick([2,3]) : 0.5;
+      var t = randInt(1,3);
+      var correct = P0 * Math.pow(r,t);
+      return {
+        topicId:"exp-log", type:"numeric",
+        stem:"אוכלוסיית חיידקים מתחילה מ-" + P0 + " יחידות, ו" + (isGrowth ? ("מוכפלת פי " + r) : "נחתכת לחצי") + " בכל יחידת זמן.\nמה גודל האוכלוסייה אחרי " + t + " יחידות זמן?",
+        correctValue: correct, tolerance:Math.max(1, correct*0.01),
+        hints:[
+          "רמז 1: הנוסחה הכללית: כמות סופית = כמות התחלתית × (יחס)^זמן.",
+          "רמז 2: הציבו P0=" + P0 + ", יחס=" + r + ", t=" + t + ".",
+          "פתרון מלא:\n" + P0 + " × " + r + "^" + t + " = " + fmtNum(correct)
+        ]
+      };
+    },
+    function genLogEval(){
+      var b = pick([2,3,5]);
+      var k = randInt(1,4);
+      var correct = Math.pow(b,k);
+      return {
+        topicId:"exp-log", type:"numeric",
+        stem:"נתון log_" + b + "(x) = " + k + ". מהו x ?",
+        correctValue: correct, tolerance:0.5,
+        hints:[
+          "רמז 1: log_b(x) = k שקול לכתוב x = b^k.",
+          "רמז 2: הציבו b=" + b + ", k=" + k + ".",
+          "פתרון מלא: x = " + b + "^" + k + " = " + correct
+        ]
+      };
+    }
+  ],
+
+  "analytic-geometry": [
+    function genDistance(){
+      var triples = [[3,4,5],[6,8,10],[5,12,13],[8,15,17]];
+      var tr = pick(triples);
+      var sx = pick([1,-1]), sy = pick([1,-1]);
+      var x1 = randInt(-5,5), y1 = randInt(-5,5);
+      var x2 = x1 + sx*tr[0], y2 = y1 + sy*tr[1];
+      return {
+        topicId:"analytic-geometry", type:"numeric",
+        stem:"מהו המרחק בין הנקודות A(" + x1 + "," + y1 + ") ו-B(" + x2 + "," + y2 + ") ?",
+        correctValue: tr[2], tolerance:0.05,
+        hints:[
+          "רמז 1: נוסחת המרחק: d = √[(x₂−x₁)² + (y₂−y₁)²].",
+          "רמז 2: חשבו קודם את ההפרשים (x₂−x₁) ו-(y₂−y₁), ואז הריבועים שלהם.",
+          "פתרון מלא:\nd = √[(" + x2 + "−(" + x1 + "))² + (" + y2 + "−(" + y1 + "))²] = √" + (tr[2]*tr[2]) + " = " + tr[2]
+        ]
+      };
+    },
+    function genSlope(){
+      var x1 = randInt(-5,5);
+      var m = randNonZero(-4,4);
+      var dx = randInt(1,4);
+      var x2 = x1 + dx;
+      var y1 = randInt(-5,5);
+      var y2 = y1 + m*dx;
+      return {
+        topicId:"analytic-geometry", type:"numeric",
+        stem:"מהו שיפוע הישר העובר דרך הנקודות A(" + x1 + "," + y1 + ") ו-B(" + x2 + "," + y2 + ") ?",
+        correctValue: m, tolerance:0.01,
+        hints:[
+          "רמז 1: נוסחת השיפוע: m = (y₂−y₁)/(x₂−x₁).",
+          "רמז 2: הציבו את הקואורדינטות של שתי הנקודות.",
+          "פתרון מלא:\nm = (" + y2 + "−(" + y1 + "))/(" + x2 + "−(" + x1 + ")) = " + m
+        ]
+      };
+    },
+    function genLineEqMC(){
+      var m = randNonZero(-4,4);
+      var x0 = randInt(-4,4), y0 = randInt(-4,4);
+      var correct = "y − (" + y0 + ") = " + m + "(x − (" + x0 + "))";
+      var d1 = "y − (" + x0 + ") = " + m + "(x − (" + y0 + "))";
+      var d2 = "y + (" + y0 + ") = " + m + "(x + (" + x0 + "))";
+      var d3 = "y − (" + y0 + ") = " + (-m) + "(x − (" + x0 + "))";
+      var choices = shuffle([correct,d1,d2,d3]);
+      var correctIndex = choices.indexOf(correct);
+      return {
+        topicId:"analytic-geometry", type:"mc",
+        stem:"מהי משוואת הישר בעל שיפוע m=" + m + " העובר דרך הנקודה (" + x0 + "," + y0 + ") ?",
+        choices: choices, correctIndex: correctIndex,
+        hints:[
+          "רמז 1: משוואת ישר בצורת נקודה-שיפוע: y − y₀ = m(x − x₀).",
+          "רמז 2: הציבו את x₀=" + x0 + " ו-y₀=" + y0 + " במקומות הנכונים.",
+          "פתרון מלא: y − (" + y0 + ") = " + m + "(x − (" + x0 + "))"
+        ]
+      };
+    },
+    function genVectorMag(){
+      var triples = [[3,4,5],[6,8,10],[5,12,13],[8,15,17]];
+      var tr = pick(triples);
+      var sx = pick([1,-1]), sy = pick([1,-1]);
+      return {
+        topicId:"analytic-geometry", type:"numeric",
+        stem:"נתון הווקטור v = (" + (sx*tr[0]) + ", " + (sy*tr[1]) + ").\nמהו הגודל (האורך) של v ?",
+        correctValue: tr[2], tolerance:0.05,
+        hints:[
+          "רמז 1: גודל וקטור: |v| = √(vₓ² + v_y²).",
+          "רמז 2: הריבועים תמיד חיוביים גם אם הרכיבים שליליים.",
+          "פתרון מלא:\n|v| = √((" + (sx*tr[0]) + ")² + (" + (sy*tr[1]) + ")²) = √" + (tr[2]*tr[2]) + " = " + tr[2]
+        ]
+      };
+    }
+  ],
+
+  "space-geometry": [
+    function genCylinderVolume(){
+      var r = randInt(2,6), h = randInt(2,9);
+      var correct = Math.PI*r*r*h;
+      return {
+        topicId:"space-geometry", type:"numeric",
+        stem:"גליל ברדיוס r=" + r + " וגובה h=" + h + ".\nמהו נפח הגליל? (עגלו לספרה אחת אחרי הנקודה)",
+        correctValue: correct, tolerance: correct*0.02,
+        hints:[
+          "רמז 1: נוסחת נפח גליל: V = πr²h.",
+          "רמז 2: הציבו r=" + r + ", h=" + h + " (ניתן להשתמש ב-π≈3.14).",
+          "פתרון מלא:\nV = π·" + r + "²·" + h + " = " + fmtNum(correct)
+        ]
+      };
+    },
+    function genConeVolume(){
+      var r = randInt(2,6), h = randInt(3,9);
+      var correct = (1/3)*Math.PI*r*r*h;
+      return {
+        topicId:"space-geometry", type:"numeric",
+        stem:"חרוט ברדיוס r=" + r + " וגובה h=" + h + ".\nמהו נפח החרוט? (עגלו לספרה אחת אחרי הנקודה)",
+        correctValue: correct, tolerance: Math.max(0.5, correct*0.02),
+        hints:[
+          "רמז 1: נוסחת נפח חרוט: V = (1/3)πr²h — שליש מנפח הגליל המתאים.",
+          "רמז 2: הציבו r=" + r + ", h=" + h + ".",
+          "פתרון מלא:\nV = (1/3)·π·" + r + "²·" + h + " = " + fmtNum(correct)
+        ]
+      };
+    },
+    function genSphereVolume(){
+      var r = pick([2,3,4,5,6]);
+      var correct = (4/3)*Math.PI*Math.pow(r,3);
+      return {
+        topicId:"space-geometry", type:"numeric",
+        stem:"כדור ברדיוס r=" + r + ".\nמהו נפח הכדור? (עגלו לספרה אחת אחרי הנקודה)",
+        correctValue: correct, tolerance: Math.max(0.5, correct*0.02),
+        hints:[
+          "רמז 1: נוסחת נפח כדור: V = (4/3)πr³.",
+          "רמז 2: הציבו r=" + r + " וזכרו לחשב קודם r³.",
+          "פתרון מלא:\nV = (4/3)·π·" + r + "³ = " + fmtNum(correct)
+        ]
+      };
+    },
+    function genSurfaceAreaMC(){
+      var correct = "4πr²";
+      var choices = shuffle([correct, "πr²", "2πr²", "(4/3)πr³"]);
+      var correctIndex = choices.indexOf(correct);
+      return {
+        topicId:"space-geometry", type:"mc",
+        stem:"מהו נוסחת שטח הפנים של כדור ברדיוס r?",
+        choices: choices, correctIndex: correctIndex,
+        hints:[
+          "רמז 1: שטח פנים נמדד ביחידות רבועות — שימו לב לחזקה של r.",
+          "רמז 2: אל תתבלבלו עם נוסחת הנפח, שכוללת r בחזקה שלישית.",
+          "פתרון מלא: שטח פני כדור = 4πr²"
+        ]
+      };
+    }
+  ],
+
+  "probability": [
+    function genBagProbability(){
+      var r = randInt(1,7), b = randInt(1,7);
+      var correct = r/(r+b);
+      return {
+        topicId:"probability", type:"numeric",
+        stem:"בכיס יש " + r + " כדורים אדומים ו-" + b + " כדורים כחולים. שולפים כדור אחד באקראי.\nמהי ההסתברות שהכדור אדום? (כתבו כמספר עשרוני, למשל 0.4)",
+        correctValue: correct, tolerance:0.02,
+        hints:[
+          "רמז 1: הסתברות = (תוצאות רצויות)/(כלל התוצאות האפשריות).",
+          "רמז 2: כלל הכדורים בכיס הוא " + r + " + " + b + " = " + (r+b) + ".",
+          "פתרון מלא: P(אדום) = " + r + "/" + (r+b) + " = " + fmtNum(correct)
+        ]
+      };
+    },
+    function genCombination(){
+      var n = randInt(4,8);
+      var k = randInt(2,n-1);
+      var correct = nCr(n,k);
+      return {
+        topicId:"probability", type:"numeric",
+        stem:"בכמה דרכים ניתן לבחור " + k + " תלמידים מתוך קבוצה של " + n + " תלמידים (הסדר אינו משנה)?",
+        correctValue: correct, tolerance:0.5,
+        hints:[
+          "רמז 1: זו בעיית קומבינציה (בחירה בלי סדר): C(n,k) = n!/(k!·(n−k)!).",
+          "רמז 2: הציבו n=" + n + ", k=" + k + ".",
+          "פתרון מלא: C(" + n + "," + k + ") = " + correct
+        ]
+      };
+    },
+    function genPermutation(){
+      var n = randInt(3,6);
+      var k = randInt(2,n);
+      var correct = nPr(n,k);
+      return {
+        topicId:"probability", type:"numeric",
+        stem:"בכמה דרכים ניתן לסדר " + k + " פרסים שונים בין " + n + " מתמודדים, כשלכל מתמודד לכל היותר פרס אחד (הסדר משנה)?",
+        correctValue: correct, tolerance:0.5,
+        hints:[
+          "רמז 1: זו בעיית תמורה (הסדר משנה): P(n,k) = n!/(n−k)!.",
+          "רמז 2: הציבו n=" + n + ", k=" + k + ".",
+          "פתרון מלא: P(" + n + "," + k + ") = " + correct
+        ]
+      };
+    },
+    function genIndependentEventsMC(){
+      var correct = "P(A)·P(B)";
+      var choices = shuffle([correct, "P(A)+P(B)", "P(A)−P(B)", "P(A)/P(B)"]);
+      var correctIndex = choices.indexOf(correct);
+      return {
+        topicId:"probability", type:"mc",
+        stem:"A ו-B הם מאורעות בלתי תלויים. מהי הנוסחה לחישוב P(A ∩ B) (שני המאורעות קורים יחד)?",
+        choices: choices, correctIndex: correctIndex,
+        hints:[
+          "רמז 1: 'בלתי תלויים' אומר שהתרחשות אחד לא משפיעה על הסתברות השני.",
+          "רמז 2: במקרה כזה — מכפילים את ההסתברויות ולא מחברים.",
+          "פתרון מלא: P(A ∩ B) = P(A)·P(B)"
+        ]
+      };
+    }
+  ],
+
+  "statistics": [
+    function genMean(){
+      var vals = [];
+      for(var i=0;i<5;i++) vals.push(randInt(60,100));
+      var sum = vals.reduce(function(a,b){return a+b;},0);
+      var correct = sum/vals.length;
+      return {
+        topicId:"statistics", type:"numeric",
+        stem:"קבוצת הציונים הבאה התקבלה במבחן: " + vals.join(", ") + ".\nמהו הממוצע?",
+        correctValue: correct, tolerance:0.05,
+        hints:[
+          "רמז 1: ממוצע = (סכום הערכים)/(מספר הערכים).",
+          "רמז 2: יש 5 ערכים בקבוצה — חשבו את הסכום שלהם קודם.",
+          "פתרון מלא:\nסכום = " + sum + ", ממוצע = " + sum + "/5 = " + fmtNum(correct)
+        ]
+      };
+    },
+    function genZScore(){
+      var mu = randInt(60,90);
+      var sigma = randInt(3,10);
+      var k = randNonZero(-3,3);
+      var x = mu + k*sigma;
+      var correct = k;
+      return {
+        topicId:"statistics", type:"numeric",
+        stem:"בקבוצת נתונים הממוצע הוא μ=" + mu + " וסטיית התקן היא σ=" + sigma + ". תלמיד קיבל ציון x=" + x + ".\nמהו ציון התקן (z-score) שלו?",
+        correctValue: correct, tolerance:0.05,
+        hints:[
+          "רמז 1: נוסחת ציון תקן: z = (x − μ)/σ.",
+          "רמז 2: הציבו x=" + x + ", μ=" + mu + ", σ=" + sigma + ".",
+          "פתרון מלא:\nz = (" + x + " − " + mu + ")/" + sigma + " = " + correct
+        ]
+      };
+    },
+    function genCorrelationMC(){
+      var correct = "בין −1 ל-1";
+      var choices = shuffle([correct, "בין 0 ל-1", "בין −∞ ל-∞", "תמיד חיובי"]);
+      var correctIndex = choices.indexOf(correct);
+      return {
+        topicId:"statistics", type:"mc",
+        stem:"מהו הטווח האפשרי של מקדם המתאם (קורלציה) r בין שני משתנים?",
+        choices: choices, correctIndex: correctIndex,
+        hints:[
+          "רמז 1: מקדם מתאם מודד גם כיוון (חיובי/שלילי) וגם עוצמה של קשר ליניארי.",
+          "רמז 2: r=1 קשר ליניארי חיובי מושלם, r=−1 קשר ליניארי שלילי מושלם.",
+          "פתרון מלא: r תמיד נמצא בין −1 ל-1"
+        ]
+      };
+    },
+    function genRange(){
+      var vals = [];
+      for(var i=0;i<5;i++) vals.push(randInt(10,90));
+      var correct = Math.max.apply(null, vals) - Math.min.apply(null, vals);
+      return {
+        topicId:"statistics", type:"numeric",
+        stem:"נתון אוסף הערכים: " + vals.join(", ") + ".\nמהו הטווח (Range) של הקבוצה?",
+        correctValue: correct, tolerance:0.5,
+        hints:[
+          "רמז 1: טווח = הערך המקסימלי − הערך המינימלי.",
+          "רמז 2: אתרו קודם את הערך הגדול ביותר ואת הקטן ביותר ברשימה.",
+          "פתרון מלא: טווח = " + Math.max.apply(null, vals) + " − " + Math.min.apply(null, vals) + " = " + correct
+        ]
+      };
+    }
+  ]
+};
+
+function generateQuestion(topicId){
+  var gens = GENERATORS[topicId];
+  if(!gens || gens.length===0) return null;
+  var fn = pick(gens);
+  var q = fn();
+  q.key = topicId + "_" + Math.random().toString(36).slice(2,9);
+  return q;
+}
+
+function buildTopicQuiz(topicId, count){
+  var out = [];
+  var gens = GENERATORS[topicId] || [];
+  if(gens.length===0) return out;
+  // try to get variety: cycle through generators, then fill randomly
+  var order = shuffle(gens.slice());
+  var i=0;
+  while(out.length < count){
+    var fn = order[i % order.length];
+    var q = fn();
+    q.key = topicId + "_" + Math.random().toString(36).slice(2,9);
+    out.push(q);
+    i++;
+  }
+  return out;
+}
+
+function buildDiagnosticQuiz(count){
+  var topics = activeTopics();
+  var out = [];
+  var perTopic = Math.max(1, Math.floor(count/topics.length));
+  topics.forEach(function(t){
+    for(var i=0;i<perTopic;i++){
+      var q = generateQuestion(t.id);
+      if(q) out.push(q);
+    }
+  });
+  // top up to reach `count` if rounding left us short
+  while(out.length < count){
+    var t2 = pick(topics);
+    var q2 = generateQuestion(t2.id);
+    if(q2) out.push(q2);
+    if(out.length > count*3) break; // safety
+  }
+  return shuffle(out);
+}
+
+/* ======================= App state & routing ======================= */
+var state = {
+  view: "dashboard",       // dashboard | topic | practice | quiz | quizResult | progress
+  currentTopicId: null,
+  quiz: null,              // {mode:'practice'|'topic-test'|'diagnostic'|'readiness', topicId, questions, index, correctCount, answered, selected, revealed, hintsUsed}
+  lastResult: null
+};
+
+function startPractice(topicId){
+  state.view = "practice";
+  state.currentTopicId = topicId;
+  state.quiz = {
+    mode:"practice", topicId: topicId,
+    questions:[generateQuestion(topicId)],
+    index:0, correctCount:0, total:0,
+    answered:false, selected:null, revealed:0, dontKnow:false
+  };
+  render();
+}
+
+function nextPracticeQuestion(){
+  var q = state.quiz;
+  q.questions.push(generateQuestion(q.topicId));
+  q.index++;
+  q.answered=false; q.selected=null; q.revealed=0; q.dontKnow=false;
+  render();
+}
+
+function startQuiz(mode, topicId){
+  var questions, count;
+  if(mode === "topic-test"){ count = 8; questions = buildTopicQuiz(topicId, count); }
+  else if(mode === "diagnostic"){ count = 16; questions = buildDiagnosticQuiz(count); }
+  else if(mode === "readiness"){ count = 20; questions = buildDiagnosticQuiz(count); }
+  else { questions = []; }
+
+  state.view = "quiz";
+  state.currentTopicId = topicId || null;
+  state.quiz = {
+    mode: mode, topicId: topicId || null,
+    questions: questions, index:0,
+    answers: [], // {key, topicId, correct, dontKnow}
+    answered:false, selected:null, revealed:0, dontKnow:false
+  };
+  render();
+}
+
+function submitQuizAnswer(isCorrect, q, dontKnow){
+  var quiz = state.quiz;
+  quiz.answers.push({key:q.key, topicId:q.topicId, correct:isCorrect, dontKnow: !!dontKnow});
+  quiz.answered = true;
+}
+
+function nextQuizQuestion(){
+  var quiz = state.quiz;
+  if(quiz.index+1 >= quiz.questions.length){
+    finishQuiz();
+    return;
+  }
+  quiz.index++;
+  quiz.answered=false; quiz.selected=null; quiz.revealed=0; quiz.dontKnow=false;
+  render();
+}
+
+function finishQuiz(){
+  var quiz = state.quiz;
+  var perTopic = {};
+  quiz.answers.forEach(function(a){
+    if(!perTopic[a.topicId]) perTopic[a.topicId] = {correct:0,total:0,dontKnow:0};
+    perTopic[a.topicId].total++;
+    if(a.correct) perTopic[a.topicId].correct++;
+    if(a.dontKnow) perTopic[a.topicId].dontKnow++;
+  });
+  var totalCorrect = quiz.answers.filter(function(a){return a.correct;}).length;
+  var totalCount = quiz.answers.length;
+
+  // record per-topic attempts
+  Object.keys(perTopic).forEach(function(tid){
+    recordTopicAttempt(tid, perTopic[tid].correct, perTopic[tid].total, perTopic[tid].dontKnow);
+  });
+
+  var result = {
+    mode: quiz.mode,
+    date: new Date().toISOString(),
+    totalCorrect: totalCorrect, totalCount: totalCount,
+    perTopic: perTopic
+  };
+
+  if(quiz.mode === "diagnostic"){
+    DATA.diagnosticRuns.push({date: result.date, overallScore: totalCorrect/totalCount, perTopic: perTopic});
+    saveData();
+  } else if(quiz.mode === "readiness"){
+    DATA.readinessRuns.push({date: result.date, overallScore: totalCorrect/totalCount, perTopic: perTopic});
+    saveData();
+  } else if(quiz.mode === "topic-test"){
+    saveData();
+  }
+
+  state.lastResult = result;
+  state.view = "quizResult";
+  render();
+}
+
+/* ======================= Rendering ======================= */
+var appEl;
+
+function render(){
+  appEl = document.getElementById("app");
+  var html = "";
+  if(state.view === "dashboard") html = renderDashboard();
+  else if(state.view === "topic") html = renderTopicDetail(state.currentTopicId);
+  else if(state.view === "practice") html = renderPractice();
+  else if(state.view === "quiz") html = renderQuiz();
+  else if(state.view === "quizResult") html = renderQuizResult();
+  else if(state.view === "progress") html = renderProgress();
+  appEl.innerHTML = html;
+  appEl.classList.remove("view-fade");
+  void appEl.offsetWidth; // force reflow so the animation retriggers on every render
+  appEl.classList.add("view-fade");
+  window.scrollTo(0,0);
+}
+
+function esc(s){
+  var d = document.createElement("div");
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function overallStats(){
+  var active = activeTopics();
+  var mastered=0, inProgress=0, notStarted=0;
+  active.forEach(function(t){
+    var s = topicStatus(t.id);
+    if(s==="mastered") mastered++; else if(s==="in-progress") inProgress++; else notStarted++;
+  });
+  var startedCount = mastered+inProgress;
+  var pct = active.length ? Math.round((mastered/active.length)*100) : 0;
+  return {active: active.length, mastered:mastered, inProgress:inProgress, notStarted:notStarted, pct:pct};
+}
+
+function ringSvg(pct, color){
+  var r = 22, c = 2*Math.PI*r;
+  var offset = c - (pct/100)*c;
+  return '<svg viewBox="0 0 56 56">' +
+    '<circle cx="28" cy="28" r="' + r + '" fill="none" stroke="var(--gray-bg)" stroke-width="6"/>' +
+    '<circle cx="28" cy="28" r="' + r + '" fill="none" stroke="' + color + '" stroke-width="6" stroke-linecap="round" ' +
+      'stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + offset.toFixed(1) + '"/>' +
+    '</svg>';
+}
+
+function renderDashboard(){
+  var stats = overallStats();
+
+  var topicsHtml = TOPICS.map(function(t){
+    if(!t.active){
+      return '<div class="topic-card locked" style="--icon-color:var(--gray);">' +
+        topicIconChip(t) +
+        '<div class="topic-card-body">' +
+        '<div class="topic-week">בקרוב</div>' +
+        '<h3>' + esc(t.title) + '</h3>' +
+        '<p style="color:var(--text-dim);font-size:0.85rem;margin:0;">' + esc(t.short) + '</p>' +
+        '<span class="status-badge status-soon">בפיתוח</span>' +
+        '</div></div>';
+    }
+    var status = topicStatus(t.id);
+    var statusLabel = status==="mastered" ? "שולט/ת בנושא" : status==="in-progress" ? "בתהליך" : "לא נלמד עדיין";
+    var statusClass = status==="mastered" ? "status-mastered" : status==="in-progress" ? "status-in-progress" : "status-not-started";
+    var scoreLabel = topicLastScoreLabel(t.id);
+    return '<div class="topic-card" style="--icon-color:' + t.accent + ';" data-action="open-topic" data-topic="' + t.id + '">' +
+      topicIconChip(t) +
+      '<div class="topic-card-body">' +
+      (t.week ? '<div class="topic-week">' + esc(t.week) + '</div>' : '') +
+      '<h3>' + esc(t.title) + '</h3>' +
+      '<p style="color:var(--text-dim);font-size:0.85rem;margin:0;">' + esc(t.short) + '</p>' +
+      '<span class="status-badge ' + statusClass + '">' + statusLabel + '</span>' +
+      (scoreLabel ? '<div class="score-pill">ציון אחרון במבחן נושא: ' + scoreLabel + '</div>' : '') +
+      '</div></div>';
+  }).join("");
+
+  var statStripHtml = '<div class="stat-strip">' +
+    '<div class="stat-ring">' + ringSvg(stats.pct, "var(--green)") +
+      '<div class="stat-ring-label">' + stats.pct + '%</div></div>' +
+    '<div class="stat-strip-text">' +
+      '<div class="stat-headline">' + (stats.mastered+stats.inProgress===0 ? "עוד לא התחלת לתרגל — בואי נתחיל!" : (stats.mastered + " מתוך " + stats.active + " נושאים בשליטה")) + '</div>' +
+      '<div class="stat-mini-legend">' +
+        '<span><span class="stat-mini-dot" style="background:var(--green);"></span>שולט/ת: ' + stats.mastered + '</span>' +
+        '<span><span class="stat-mini-dot" style="background:var(--amber);"></span>בתהליך: ' + stats.inProgress + '</span>' +
+        '<span><span class="stat-mini-dot" style="background:var(--gray);"></span>טרם התחיל: ' + stats.notStarted + '</span>' +
+      '</div>' +
+    '</div>' +
+    '<button class="btn-secondary" data-action="show-progress">' + svgIcon(ICONS.chart) + ' ההתקדמות שלי</button>' +
+  '</div>';
+
+  return '' +
+  '<header class="top">' +
+    '<div class="title-block">' +
+      '<h1>מ-3 יחידות ל-4 יחידות במתמטיקה</h1>' +
+      '<div class="subtitle">תרגול אישי, שמור אוטומטית במכשיר הזה — בלי אינטרנט ובלי התחברות</div>' +
+    '</div>' +
+  '</header>' +
+
+  statStripHtml +
+
+  '<div class="hero-actions">' +
+    '<div class="hero-btn" style="--icon-color:var(--accent-indigo);--icon-bg:#eeecfc;" data-action="start-diagnostic">' +
+      topicIconChip({active:true, iconKey:"compass", accent:"var(--accent-indigo)", accentBg:"#eeecfc"}) +
+      '<div><h3>מבחן אבחון ראשוני</h3>' +
+      '<p>16 שאלות ממגוון הנושאים, כדי לראות איפה עומדים עכשיו. כל הרצה שונה מהקודמת.</p></div>' +
+    '</div>' +
+    '<div class="hero-btn" style="--icon-color:var(--accent-teal);--icon-bg:#e2f5f3;" data-action="start-readiness">' +
+      topicIconChip({active:true, iconKey:"target", accent:"var(--accent-teal)", accentBg:"#e2f5f3"}) +
+      '<div><h3>מבחן מוכנות ל-4 יחידות</h3>' +
+      '<p>מבחן מקיף (20 שאלות) עם דוח המלצות אישי בסוף — אילו נושאים מוכנים ואילו דורשים תרגול.</p></div>' +
+    '</div>' +
+  '</div>' +
+
+  '<h2>נושאי הלימוד</h2>' +
+  '<div class="topics-grid">' + topicsHtml + '</div>' +
+
+  '<div class="card row between" style="margin-top:20px;">' +
+    '<div>' +
+      '<h3 style="margin-bottom:4px;">גיבוי והעברת נתונים</h3>' +
+      '<p style="color:var(--text-dim);font-size:0.85rem;margin:0;">ההתקדמות נשמרת בדפדפן הזה בלבד. אפשר לייצא גיבוי ולייבא אותו במחשב/דפדפן אחר.</p>' +
+    '</div>' +
+    '<div class="row">' +
+      '<button class="btn-secondary" data-action="export-data">' + svgIcon(ICONS.download) + ' ייצוא נתונים</button>' +
+      '<button class="btn-secondary" data-action="import-data">' + svgIcon(ICONS.upload) + ' ייבוא נתונים</button>' +
+    '</div>' +
+  '</div>' +
+
+  '<footer class="app-footer">כל השאלות וההסברים נכתבו במקור עבור האפליקציה. הסרטונים המקושרים הם קישורים חיצוניים למקורות קיימים.</footer>';
+}
+
+function renderTopicDetail(topicId){
+  var t = getTopic(topicId);
+  if(!t) return renderDashboard();
+  var status = topicStatus(t.id);
+  var attempts = (DATA.topics[t.id] && DATA.topics[t.id].attempts) || [];
+
+  var explainHtml = "";
+  if(t.explain){
+    explainHtml = '<div class="explain-block">' +
+      '<h4>מה זה אומר</h4><p>' + esc(t.explain.whatIsIt) + '</p>' +
+      '<h4>הנוסחאות המרכזיות</h4>' +
+      t.explain.formulas.map(function(f){return '<div class="formula">'+esc(f)+'</div>';}).join("") +
+      '<h4>דוגמה מלאה</h4><p style="white-space:pre-wrap;">' + esc(t.explain.example) + '</p>' +
+      '<h4>טעויות נפוצות</h4><ul class="mistakes-list">' +
+      t.explain.mistakes.map(function(m){return '<li>'+esc(m)+'</li>';}).join("") + '</ul>' +
+      '</div>';
+  }
+
+  var videosHtml = "";
+  if(t.videos && t.videos.length){
+    videosHtml = '<div class="card"><h3>סרטוני הדרכה</h3><div class="video-links">' +
+      t.videos.map(function(v){return '<a href="'+esc(v.url)+'" target="_blank" rel="noopener">▶ '+esc(v.label)+'</a>';}).join("") +
+      '</div></div>';
+  }
+
+  var historyHtml = "";
+  if(attempts.length){
+    historyHtml = '<div class="card"><h3>היסטוריית מבחני נושא</h3>' +
+      attempts.slice().reverse().slice(0,8).map(function(a){
+        var pct = Math.round((a.correct/a.total)*100);
+        var d = new Date(a.date);
+        return '<div class="result-topic-row"><span>' + d.toLocaleDateString("he-IL") + '</span><span>' + a.correct + '/' + a.total + ' (' + pct + '%)</span></div>';
+      }).join("") + '</div>';
+  }
+
+  return '' +
+    '<div class="breadcrumb"><span data-action="go-dashboard">לוח הבקרה</span> ← ' + esc(t.title) + '</div>' +
+    '<div class="row" style="align-items:center;gap:14px;margin-bottom:2px;">' +
+      topicIconChip(t) +
+      '<div><h1 style="margin-bottom:0;">' + esc(t.title) + (t.week ? ' <span style="font-size:0.9rem;color:var(--text-dim);font-weight:400;">(' + esc(t.week) + ')</span>' : '') + '</h1></div>' +
+    '</div>' +
+    '<p class="subtitle">' + esc(t.short) + '</p>' +
+    explainHtml +
+    videosHtml +
+    '<div class="row" style="margin:16px 0;">' +
+      '<button class="btn-primary" data-action="start-practice" data-topic="' + t.id + '">תרגול עם רמזים</button>' +
+      '<button class="btn-secondary" data-action="start-topic-test" data-topic="' + t.id + '">מבחן נושא (8 שאלות)</button>' +
+    '</div>' +
+    historyHtml;
+}
+
+function renderQuestionCommon(q, quizStateObj, opts){
+  // opts: {onSubmit, onNext, showHintButton, footerExtra}
+  var body = '<div class="question-stem">' + esc(q.stem) + '</div>';
+
+  if(q.type === "mc"){
+    body += '<div class="choices">';
+    q.choices.forEach(function(choice, i){
+      var cls = "choice";
+      if(quizStateObj.answered){
+        if(i === q.correctIndex) cls += " correct";
+        else if(i === quizStateObj.selected) cls += " incorrect";
+      } else if(i === quizStateObj.selected){
+        cls += " selected";
+      }
+      body += '<div class="' + cls + '" data-action="select-choice" data-index="' + i + '">' + esc(choice) + '</div>';
+    });
+    body += '</div>';
+  } else {
+    body += '<div class="numeric-input-row">' +
+      '<input type="text" inputmode="decimal" id="numericAnswerInput" placeholder="הזן/י תשובה מספרית" ' +
+      (quizStateObj.answered ? 'disabled' : '') + ' value="' + (quizStateObj.selected!==null && quizStateObj.selected!==undefined ? esc(String(quizStateObj.selected)) : '') + '">' +
+      '</div>';
+  }
+
+  if(quizStateObj.answered){
+    if(quizStateObj.dontKnow){
+      body += '<div class="feedback-box feedback-neutral">🤔 אין בעיה — לא כל שאלה צריך לדעת. הנה איך פותרים:' +
+        (q.type==="numeric" ? (" (התשובה הנכונה: " + fmtNum(q.correctValue) + ")") : "") + '</div>';
+    } else {
+      var isCorrect = q.type==="mc" ? quizStateObj.selected === q.correctIndex : checkNumeric(quizStateObj.selected, q.correctValue, q.tolerance);
+      body += '<div class="feedback-box ' + (isCorrect ? "feedback-correct" : "feedback-incorrect") + '">' +
+        (isCorrect ? "✔ נכון!" : ("✘ לא מדויק. " + (q.type==="numeric" ? ("התשובה הנכונה: " + fmtNum(q.correctValue)) : ""))) +
+        '</div>';
+    }
+    body += '<div class="hint-box">' + esc(q.hints[q.hints.length-1]) + '</div>';
+  } else {
+    // hint progression (only outside strict test modes if allowed)
+    if(opts.showHintButton){
+      for(var h=0; h<quizStateObj.revealed; h++){
+        body += '<div class="hint-box">' + esc(q.hints[h]) + '</div>';
+      }
+      if(quizStateObj.revealed < q.hints.length){
+        body += '<div class="row" style="margin-top:8px;"><button class="btn-ghost" data-action="reveal-hint">💡 ' + (quizStateObj.revealed===0? "רמז" : "רמז נוסף") + '</button></div>';
+      }
+    }
+  }
+
+  return body;
+}
+
+function renderPractice(){
+  var quiz = state.quiz;
+  var q = quiz.questions[quiz.index];
+  var t = getTopic(quiz.topicId);
+
+  var body = renderQuestionCommon(q, quiz, {showHintButton:true});
+
+  var footer = '<div class="row" style="margin-top:16px;">';
+  if(!quiz.answered){
+    footer += '<button class="btn-primary" data-action="check-answer">בדוק/י תשובה</button>';
+    footer += '<button class="btn-ghost" data-action="dont-know">🤔 לא יודע/ת לפתור</button>';
+  } else {
+    footer += '<button class="btn-primary" data-action="practice-next">שאלה הבאה</button>';
+  }
+  footer += '<button class="btn-secondary" data-action="go-topic" data-topic="' + quiz.topicId + '">סיום תרגול וחזרה לנושא</button>';
+  footer += '</div>';
+
+  return '<div class="breadcrumb"><span data-action="go-dashboard">לוח הבקרה</span> ← <span data-action="go-topic" data-topic="' + quiz.topicId + '">' + esc(t.title) + '</span> ← תרגול</div>' +
+    '<div class="quiz-header"><span>תרגול חופשי — ' + esc(t.title) + '</span><span>שאלה מס׳ ' + (quiz.index+1) + '</span></div>' +
+    '<div class="card">' + body + footer + '</div>';
+}
+
+function renderQuiz(){
+  var quiz = state.quiz;
+  if(quiz.questions.length === 0){
+    return '<div class="empty-state"><h2>אין עדיין מספיק שאלות</h2><p>הנושאים הפעילים עדיין בבנייה. נסו נושא אחר.</p><button class="btn-primary" data-action="go-dashboard">חזרה ללוח הבקרה</button></div>';
+  }
+  var q = quiz.questions[quiz.index];
+  var t = getTopic(q.topicId);
+  var titleMap = {"topic-test":"מבחן נושא", "diagnostic":"מבחן אבחון", "readiness":"מבחן מוכנות ל-4 יחידות"};
+
+  var body = renderQuestionCommon(q, quiz, {showHintButton:false}); // no hints in tests, keeps it a real assessment
+
+  var footer = '<div class="row" style="margin-top:16px;">';
+  if(!quiz.answered){
+    footer += '<button class="btn-primary" data-action="check-answer">שלח/י תשובה</button>';
+    footer += '<button class="btn-ghost" data-action="dont-know">🤔 לא יודע/ת לפתור</button>';
+  } else {
+    var isLast = quiz.index+1 >= quiz.questions.length;
+    footer += '<button class="btn-primary" data-action="quiz-next">' + (isLast ? "סיום וצפייה בתוצאה" : "שאלה הבאה") + '</button>';
+  }
+  footer += '</div>';
+
+  var pct = Math.round((quiz.index)/quiz.questions.length*100);
+  var barColor = (quiz.mode === "topic-test" && t) ? t.accent : "var(--primary)";
+
+  return '<div class="quiz-header"><span>' + esc(titleMap[quiz.mode] || "מבחן") + (quiz.mode==="topic-test" && t ? (" — " + esc(t.title)) : "") + '</span><span>שאלה ' + (quiz.index+1) + ' מתוך ' + quiz.questions.length + '</span></div>' +
+    '<div class="quiz-progress-outer"><div class="quiz-progress-inner" style="width:' + pct + '%;background:' + barColor + ';"></div></div>' +
+    '<div class="card">' + body + footer + '</div>';
+}
+
+function topicWeaknessTag(pct, hasData, dontKnowCount, total){
+  if(!hasData) return {label:"לא נלמד עדיין", cls:"tag-none"};
+  if(dontKnowCount && dontKnowCount === total) return {label:"לא נלמד עדיין", cls:"tag-none"};
+  if(pct >= 0.8) return {label:"נושא חזק", cls:"tag-strong"};
+  if(pct >= 0.5) return {label:"דורש חיזוק", cls:"tag-medium"};
+  return {label:"נושא חלש", cls:"tag-weak"};
+}
+
+function renderQuizResult(){
+  var r = state.lastResult;
+  var titleMap = {"topic-test":"תוצאת מבחן נושא", "diagnostic":"תוצאת מבחן אבחון", "readiness":"דוח מוכנות ל-4 יחידות"};
+  var pct = Math.round((r.totalCorrect/r.totalCount)*100);
+
+  var rowsHtml = activeTopics().map(function(t){
+    var tp = r.perTopic[t.id];
+    var hasData = !!tp;
+    var pctT = hasData ? tp.correct/tp.total : 0;
+    var tag = topicWeaknessTag(pctT, hasData, hasData ? tp.dontKnow : 0, hasData ? tp.total : 0);
+    var dontKnowNote = (hasData && tp.dontKnow) ? (' · ' + tp.dontKnow + ' סומנו "לא יודע/ת"') : '';
+    return '<div class="result-topic-row">' +
+      '<span>' + esc(t.title) + (hasData ? (' — ' + tp.correct + '/' + tp.total + dontKnowNote) : '') + '</span>' +
+      '<span class="tag ' + tag.cls + '">' + tag.label + '</span>' +
+      '</div>';
+  }).join("");
+
+  var readinessNote = "";
+  if(r.mode === "readiness"){
+    var readyPct = pct;
+    readinessNote = '<div class="feedback-box ' + (readyPct>=60 ? "feedback-correct" : "feedback-incorrect") + '" style="margin-top:14px;">' +
+      (readyPct>=60 ? "ציון של 60% ומעלה נחשב מוכנות סבירה להצטרפות לכיתת 4 יח\"ל 🎉" : "ציון מתחת ל-60% — מומלץ שבוע נוסף ממוקד בנושאים החלשים ביותר לפני ההצטרפות בפועל.") +
+      '</div>';
+  }
+
+  return '' +
+    '<h2>' + esc(titleMap[r.mode] || "תוצאה") + '</h2>' +
+    '<div class="card">' +
+      '<div class="big-score">' + pct + '%</div>' +
+      '<div class="big-score-sub">' + r.totalCorrect + ' תשובות נכונות מתוך ' + r.totalCount + '</div>' +
+      readinessNote +
+      '<h3 style="margin-top:18px;">פירוט לפי נושא</h3>' +
+      rowsHtml +
+    '</div>' +
+    '<div class="row">' +
+      '<button class="btn-primary" data-action="go-dashboard">חזרה ללוח הבקרה</button>' +
+      '<button class="btn-secondary" data-action="show-progress">צפייה בגרף ההתקדמות</button>' +
+    '</div>';
+}
+
+function buildChartSvg(points, width, height, color){
+  if(points.length === 0) return '<div class="empty-state">אין עדיין נתונים להצגה</div>';
+  width = width || 600; height = height || 180;
+  var pad = 30;
+  var maxY = 100, minY = 0;
+  var n = points.length;
+  var stepX = n>1 ? (width-2*pad)/(n-1) : 0;
+  function xAt(i){ return pad + stepX*i; }
+  function yAt(v){ return height-pad - ((v-minY)/(maxY-minY))*(height-2*pad); }
+
+  var pathD = points.map(function(p,i){ return (i===0?"M":"L") + xAt(i).toFixed(1) + "," + yAt(p.value).toFixed(1); }).join(" ");
+  var circles = points.map(function(p,i){
+    return '<circle cx="'+xAt(i).toFixed(1)+'" cy="'+yAt(p.value).toFixed(1)+'" r="4" fill="'+color+'"></circle>' +
+      '<title>' + esc(p.label) + ': ' + Math.round(p.value) + '%</title>';
+  }).join("");
+  var gridLines = [0,25,50,75,100].map(function(v){
+    return '<line x1="'+pad+'" y1="'+yAt(v).toFixed(1)+'" x2="'+(width-pad)+'" y2="'+yAt(v).toFixed(1)+'" stroke="#e1e5ee" stroke-width="1"></line>' +
+      '<text x="4" y="'+(yAt(v)+4).toFixed(1)+'" font-size="10" fill="#8a93a3">'+v+'%</text>';
+  }).join("");
+
+  return '<svg class="chart" viewBox="0 0 ' + width + ' ' + height + '" xmlns="http://www.w3.org/2000/svg">' +
+    gridLines +
+    '<path d="' + pathD + '" fill="none" stroke="' + color + '" stroke-width="2.5"></path>' +
+    circles +
+    '</svg>';
+}
+
+function renderProgress(){
+  var diagPoints = DATA.diagnosticRuns.map(function(r,i){
+    return {label:"אבחון " + (i+1) + " — " + new Date(r.date).toLocaleDateString("he-IL"), value: r.overallScore*100};
+  });
+  var readyPoints = DATA.readinessRuns.map(function(r,i){
+    return {label:"מוכנות " + (i+1) + " — " + new Date(r.date).toLocaleDateString("he-IL"), value: r.overallScore*100};
+  });
+
+  var topicBlocks = activeTopics().map(function(t){
+    var attempts = (DATA.topics[t.id] && DATA.topics[t.id].attempts) || [];
+    var points = attempts.map(function(a,i){
+      return {label:"מבחן " + (i+1) + " — " + new Date(a.date).toLocaleDateString("he-IL"), value:(a.correct/a.total)*100};
+    });
+    return '<div class="card"><h3>' + esc(t.title) + '</h3>' + buildChartSvg(points, 600, 140, "#3457d5") + '</div>';
+  }).join("");
+
+  return '' +
+    '<div class="breadcrumb"><span data-action="go-dashboard">לוח הבקרה</span> ← ההתקדמות שלי</div>' +
+    '<h1>ההתקדמות שלי</h1>' +
+    '<div class="card"><h3>ציון במבחני אבחון לאורך זמן</h3>' + buildChartSvg(diagPoints, 600, 180, "#1f9d63") + '</div>' +
+    '<div class="card"><h3>ציון במבחני מוכנות לאורך זמן</h3>' + buildChartSvg(readyPoints, 600, 180, "#b8790a") + '</div>' +
+    '<h2>לפי נושא</h2>' +
+    topicBlocks;
+}
+
+/* ======================= Event handling ======================= */
+document.addEventListener("click", function(e){
+  var target = e.target.closest("[data-action]");
+  if(!target) return;
+  var action = target.getAttribute("data-action");
+
+  if(action === "go-dashboard"){ state.view="dashboard"; render(); }
+  else if(action === "open-topic"){ state.currentTopicId = target.getAttribute("data-topic"); state.view="topic"; render(); }
+  else if(action === "go-topic"){ state.currentTopicId = target.getAttribute("data-topic"); state.view="topic"; render(); }
+  else if(action === "start-practice"){ recordPractice(target.getAttribute("data-topic")); startPractice(target.getAttribute("data-topic")); }
+  else if(action === "start-topic-test"){ startQuiz("topic-test", target.getAttribute("data-topic")); }
+  else if(action === "start-diagnostic"){ startQuiz("diagnostic", null); }
+  else if(action === "start-readiness"){ startQuiz("readiness", null); }
+  else if(action === "show-progress"){ state.view="progress"; render(); }
+  else if(action === "export-data"){ exportData(); }
+  else if(action === "import-data"){ document.getElementById("importFileInput").click(); }
+  else if(action === "select-choice"){
+    var quiz = state.quiz;
+    if(quiz.answered) return;
+    quiz.selected = parseInt(target.getAttribute("data-index"),10);
+    render();
+  }
+  else if(action === "reveal-hint"){
+    var quiz2 = state.quiz;
+    quiz2.revealed = Math.min(quiz2.revealed+1, state.quiz.questions[quiz2.index].hints.length);
+    render();
+  }
+  else if(action === "check-answer"){ handleCheckAnswer(); }
+  else if(action === "dont-know"){ handleDontKnow(); }
+  else if(action === "practice-next"){ nextPracticeQuestion(); }
+  else if(action === "quiz-next"){ nextQuizQuestion(); }
+});
+
+document.addEventListener("input", function(e){
+  if(e.target && e.target.id === "numericAnswerInput"){
+    var quizObj = state.view === "practice" ? state.quiz : state.quiz;
+    quizObj.selected = e.target.value;
+  }
+});
+
+document.getElementById("importFileInput").addEventListener("change", function(e){
+  if(e.target.files && e.target.files[0]){
+    importDataFromFile(e.target.files[0]);
+  }
+  e.target.value = "";
+});
+
+function handleCheckAnswer(){
+  var quiz = state.quiz;
+  var q = quiz.questions[quiz.index];
+  if(quiz.answered) return;
+
+  if(q.type === "mc"){
+    if(quiz.selected === null || quiz.selected === undefined){ showToast("בחר/י תשובה קודם"); return; }
+  } else {
+    if(quiz.selected === null || quiz.selected === undefined || quiz.selected === ""){ showToast("הזן/י תשובה קודם"); return; }
+  }
+
+  var isCorrect = q.type === "mc" ? quiz.selected === q.correctIndex : checkNumeric(quiz.selected, q.correctValue, q.tolerance);
+  quiz.answered = true;
+
+  if(state.view === "quiz"){
+    submitQuizAnswer(isCorrect, q);
+  } else if(state.view === "practice"){
+    quiz.total = (quiz.total||0) + 1;
+    if(isCorrect) quiz.correctCount = (quiz.correctCount||0) + 1;
+  }
+  render();
+}
+
+function handleDontKnow(){
+  var quiz = state.quiz;
+  var q = quiz.questions[quiz.index];
+  if(quiz.answered) return;
+
+  quiz.answered = true;
+  quiz.dontKnow = true;
+
+  if(state.view === "quiz"){
+    submitQuizAnswer(false, q, true);
+  } else if(state.view === "practice"){
+    quiz.total = (quiz.total||0) + 1;
+  }
+  render();
+}
+
+/* ======================= Init ======================= */
+render();
+
+})();
+</script>
+</body>
+</html>
