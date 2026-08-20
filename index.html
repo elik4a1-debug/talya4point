@@ -304,9 +304,34 @@
   .stat-mini-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:0.78rem;color:var(--text-dim);}
   .stat-mini-legend span{display:inline-flex;align-items:center;gap:4px;}
   .stat-mini-dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+
+  /* ---- Persistent top navigation bar (Back / Home) ---- */
+  .top-nav-bar{
+    position:fixed; top:0; left:0; right:0; z-index:80;
+    display:flex; justify-content:space-between; align-items:center; gap:8px;
+    padding:10px 16px; background:var(--card-bg); border-bottom:1px solid var(--border);
+    box-shadow:0 2px 10px rgba(30,36,51,0.06);
+  }
+  .top-nav-btn{
+    display:inline-flex; align-items:center; gap:6px; font-family:inherit;
+    background:var(--gray-bg); color:var(--text); border:none; border-radius:999px;
+    padding:9px 18px; font-weight:700; font-size:0.85rem; cursor:pointer; transition:background .15s ease;
+  }
+  .top-nav-btn:hover{background:var(--border);}
+  .top-nav-btn:disabled{opacity:0.4; cursor:default; pointer-events:none;}
+  .top-nav-home{background:var(--primary); color:#fff;}
+  .top-nav-home:hover{background:var(--primary-dark);}
+  #app{padding-top:70px;}
+  @media (max-width:480px){
+    .top-nav-btn{padding:8px 13px; font-size:0.8rem;}
+  }
 </style>
 </head>
 <body>
+<div class="top-nav-bar" id="topNavBar">
+  <button class="top-nav-btn" id="topNavBackBtn" data-action="go-back" disabled>← חזור</button>
+  <button class="top-nav-btn top-nav-home" data-action="go-dashboard">🏠 עמוד הבית</button>
+</div>
 <div id="app"></div>
 <input type="file" id="importFileInput" accept=".json" style="display:none;">
 <div class="toast" id="toast"></div>
@@ -1640,6 +1665,23 @@ var state = {
   lastActivity: null       // {topicTitle, stem, correctAnswerText, userAnswerText, wasCorrect, wasDontKnow, fullSolution} - most recent answered question, used as context for the "ask a question" helper
 };
 
+/* ======================= Back / Home navigation ======================= */
+var viewHistory = []; // stack of {view, currentTopicId, lastResult} snapshots, for the persistent "חזור" button
+
+function updateTopNavBar(){
+  var backBtn = document.getElementById("topNavBackBtn");
+  if(backBtn) backBtn.disabled = viewHistory.length === 0;
+}
+
+function goBack(){
+  if(viewHistory.length === 0) return;
+  var prev = viewHistory.pop();
+  state.view = prev.view;
+  state.currentTopicId = prev.currentTopicId;
+  state.lastResult = prev.lastResult;
+  render();
+}
+
 /* ======================= Encouragement messages ======================= */
 var PRAISE_GENERAL = [
   "יפה טליה!", "כל הכבוד טליה!", "מצוין טליה!", "ישר וחזק, טליה!", "נכון לגמרי!", "בול בעשרה!", "כל הכבוד, ככה עושים את זה!"
@@ -1784,6 +1826,7 @@ function render(){
   void appEl.offsetWidth; // force reflow so the animation retriggers on every render
   appEl.classList.add("view-fade");
   window.scrollTo(0,0);
+  updateTopNavBar();
 }
 
 function esc(s){
@@ -2188,6 +2231,7 @@ document.addEventListener("click", function(e){
   var target = e.target.closest("[data-action]");
   if(!target) return;
   var action = target.getAttribute("data-action");
+  var viewBefore = {view: state.view, currentTopicId: state.currentTopicId, lastResult: state.lastResult};
 
   if(action === "go-dashboard"){ state.view="dashboard"; render(); }
   else if(action === "open-topic"){ state.currentTopicId = target.getAttribute("data-topic"); state.view="topic"; render(); }
@@ -2219,6 +2263,16 @@ document.addEventListener("click", function(e){
   else if(action === "toggle-ask-panel"){ toggleAskPanel(); }
   else if(action === "ask-send"){ sendAskQuestion(); }
   else if(action === "ask-login"){ submitAskLogin(); }
+  else if(action === "go-back"){ goBack(); }
+
+  if(action !== "go-back"){
+    var navigated = state.view !== viewBefore.view || state.currentTopicId !== viewBefore.currentTopicId;
+    if(navigated){
+      viewHistory.push(viewBefore);
+      if(viewHistory.length > 30) viewHistory.shift();
+      updateTopNavBar();
+    }
+  }
 });
 
 document.getElementById("askPanelOverlay").addEventListener("click", function(e){
