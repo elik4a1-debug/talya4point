@@ -254,6 +254,13 @@
     padding:8px 18px; font-size:0.78rem; color:var(--text-dim); background:var(--gray-bg);
     border-bottom:1px solid var(--border); flex-shrink:0;
   }
+  .ask-panel-topic-select{
+    padding:8px 18px; font-size:0.78rem; color:var(--text-dim); background:var(--gray-bg);
+    border-bottom:1px solid var(--border); flex-shrink:0; display:flex; align-items:center; gap:8px;
+  }
+  .ask-panel-topic-select select{
+    flex:1; padding:6px 8px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:0.8rem; background:#fff;
+  }
   .ask-panel-disclaimer{
     padding:8px 18px; font-size:0.72rem; color:var(--amber); background:var(--amber-bg);
     border-bottom:1px solid var(--border); flex-shrink:0; line-height:1.5;
@@ -1633,6 +1640,22 @@ var state = {
   lastActivity: null       // {topicTitle, stem, correctAnswerText, userAnswerText, wasCorrect, wasDontKnow, fullSolution} - most recent answered question, used as context for the "ask a question" helper
 };
 
+/* ======================= Encouragement messages ======================= */
+var PRAISE_GENERAL = [
+  "יפה טליה!", "כל הכבוד טליה!", "מצוין טליה!", "ישר וחזק, טליה!", "נכון לגמרי!", "בול בעשרה!", "כל הכבוד, ככה עושים את זה!"
+];
+var PRAISE_STREAK = [
+  "עוד נכונה! את/ה ממש בכיוון הנכון, טליה.", "רצף יפה! ההבנה שלך ניכרת.", "כל הכבוד, טליה — שתי נכונות ברצף!", "מצוין! ממשיכה ככה ואת/ה תראי איך זה משתפר."
+];
+var PRAISE_BIG_STREAK = [
+  "וואו, טליה! רצף מרשים של תשובות נכונות — הבנת ואת מתקדמת!", "פשוט מעולה — ניכר שאת שולטת בחומר הזה!", "כל הכבוד ענק! רצף כזה זה סימן להבנה אמיתית של הנושא.", "מדהים, טליה! ממש רואים את ההתקדמות שלך."
+];
+function pickPraiseMessage(streak){
+  if(streak >= 5) return pick(PRAISE_BIG_STREAK);
+  if(streak >= 2) return pick(PRAISE_STREAK);
+  return pick(PRAISE_GENERAL);
+}
+
 function recordLastActivity(q, opts){
   // opts: {userAnswerText, wasCorrect, wasDontKnow}
   var t = getTopic(q.topicId);
@@ -1655,7 +1678,8 @@ function startPractice(topicId){
     mode:"practice", topicId: topicId,
     questions:[generateQuestion(topicId)],
     index:0, correctCount:0, total:0,
-    answered:false, selected:null, revealed:0, dontKnow:false
+    answered:false, selected:null, revealed:0, dontKnow:false,
+    correctStreak:0, lastPraiseMsg:"", dontKnowRevealed:false
   };
   render();
 }
@@ -1664,7 +1688,7 @@ function nextPracticeQuestion(){
   var q = state.quiz;
   q.questions.push(generateQuestion(q.topicId));
   q.index++;
-  q.answered=false; q.selected=null; q.revealed=0; q.dontKnow=false;
+  q.answered=false; q.selected=null; q.revealed=0; q.dontKnow=false; q.dontKnowRevealed=false;
   render();
 }
 
@@ -1681,7 +1705,8 @@ function startQuiz(mode, topicId){
     mode: mode, topicId: topicId || null,
     questions: questions, index:0,
     answers: [], // {key, topicId, correct, dontKnow}
-    answered:false, selected:null, revealed:0, dontKnow:false
+    answered:false, selected:null, revealed:0, dontKnow:false,
+    correctStreak:0, lastPraiseMsg:"", dontKnowRevealed:false
   };
   render();
 }
@@ -1699,7 +1724,7 @@ function nextQuizQuestion(){
     return;
   }
   quiz.index++;
-  quiz.answered=false; quiz.selected=null; quiz.revealed=0; quiz.dontKnow=false;
+  quiz.answered=false; quiz.selected=null; quiz.revealed=0; quiz.dontKnow=false; quiz.dontKnowRevealed=false;
   render();
 }
 
@@ -1962,14 +1987,24 @@ function renderQuestionCommon(q, quizStateObj, opts){
 
   if(quizStateObj.answered){
     if(quizStateObj.dontKnow){
-      body += '<div class="feedback-box feedback-neutral">🤔 אין בעיה — לא כל שאלה צריך לדעת. ' +
-        (q.type==="numeric" ? ("התשובה הנכונה: " + fmtNum(q.correctValue) + ". ") : "") +
-        'בואו נראה יחד איך מגיעים לפתרון, צעד אחר צעד:</div>';
-      body += renderStepByStepExplanation(q);
+      if(!quizStateObj.dontKnowRevealed){
+        body += '<div class="feedback-box feedback-neutral">🤔 אין בעיה — לא כל שאלה צריך לדעת.</div>';
+        body += '<div class="explain-heading">האם תרצי לראות את שיטת הפתרון והתוצאה?</div>';
+        body += '<div class="row" style="margin-top:8px;">' +
+          '<button class="btn-primary" data-action="reveal-dontknow-solution">כן</button>' +
+          '<button class="btn-ghost" data-action="skip-dontknow-solution">לא</button>' +
+          '</div>';
+      } else {
+        body += '<div class="feedback-box feedback-neutral">🤔 אין בעיה — לא כל שאלה צריך לדעת. ' +
+          (q.type==="numeric" ? ("התשובה הנכונה: " + fmtNum(q.correctValue) + ". ") : "") +
+          'בואו נראה יחד איך מגיעים לפתרון, צעד אחר צעד:</div>';
+        body += renderStepByStepExplanation(q);
+        body += '<div class="row" style="margin-top:12px;"><button class="btn-ghost" data-action="toggle-ask-panel">💬 שאלה נוספת על הנושא</button></div>';
+      }
     } else {
       var isCorrect = q.type==="mc" ? quizStateObj.selected === q.correctIndex : checkNumeric(quizStateObj.selected, q.correctValue, q.tolerance);
       body += '<div class="feedback-box ' + (isCorrect ? "feedback-correct" : "feedback-incorrect") + '">' +
-        (isCorrect ? "✔ נכון!" : ("✘ לא מדויק. " + (q.type==="numeric" ? ("התשובה הנכונה: " + fmtNum(q.correctValue)) : ""))) +
+        (isCorrect ? ("✔ " + esc(quizStateObj.lastPraiseMsg || "נכון!")) : ("✘ לא מדויק. " + (q.type==="numeric" ? ("התשובה הנכונה: " + fmtNum(q.correctValue)) : ""))) +
         '</div>';
       if(isCorrect){
         body += '<div class="hint-box">' + esc(q.hints[q.hints.length-1]) + '</div>';
@@ -2004,6 +2039,8 @@ function renderPractice(){
   if(!quiz.answered){
     footer += '<button class="btn-primary" data-action="check-answer">בדוק/י תשובה</button>';
     footer += '<button class="btn-ghost" data-action="dont-know">🤔 לא יודע/ת לפתור</button>';
+  } else if(quiz.dontKnow && !quiz.dontKnowRevealed){
+    // Yes/No solution-reveal prompt (rendered inside the body) handles navigation here
   } else {
     footer += '<button class="btn-primary" data-action="practice-next">שאלה הבאה</button>';
   }
@@ -2030,6 +2067,8 @@ function renderQuiz(){
   if(!quiz.answered){
     footer += '<button class="btn-primary" data-action="check-answer">שלח/י תשובה</button>';
     footer += '<button class="btn-ghost" data-action="dont-know">🤔 לא יודע/ת לפתור</button>';
+  } else if(quiz.dontKnow && !quiz.dontKnowRevealed){
+    // Yes/No solution-reveal prompt (rendered inside the body) handles navigation here
   } else {
     var isLast = quiz.index+1 >= quiz.questions.length;
     footer += '<button class="btn-primary" data-action="quiz-next">' + (isLast ? "סיום וצפייה בתוצאה" : "שאלה הבאה") + '</button>';
@@ -2173,6 +2212,8 @@ document.addEventListener("click", function(e){
   }
   else if(action === "check-answer"){ handleCheckAnswer(); }
   else if(action === "dont-know"){ handleDontKnow(); }
+  else if(action === "reveal-dontknow-solution"){ state.quiz.dontKnowRevealed = true; render(); }
+  else if(action === "skip-dontknow-solution"){ if(state.view === "practice"){ nextPracticeQuestion(); } else { nextQuizQuestion(); } }
   else if(action === "practice-next"){ nextPracticeQuestion(); }
   else if(action === "quiz-next"){ nextQuizQuestion(); }
   else if(action === "toggle-ask-panel"){ toggleAskPanel(); }
@@ -2197,6 +2238,13 @@ document.addEventListener("input", function(e){
   }
   if(e.target && e.target.id === "askPasswordInput"){
     askState.loginDraft.password = e.target.value;
+  }
+});
+
+document.addEventListener("change", function(e){
+  if(e.target && e.target.id === "askTopicSelect"){
+    askState.selectedTopicId = e.target.value;
+    renderAskPanel();
   }
 });
 
@@ -2232,6 +2280,13 @@ function handleCheckAnswer(){
   var isCorrect = q.type === "mc" ? quiz.selected === q.correctIndex : checkNumeric(quiz.selected, q.correctValue, q.tolerance);
   quiz.answered = true;
 
+  if(isCorrect){
+    quiz.correctStreak = (quiz.correctStreak||0) + 1;
+    quiz.lastPraiseMsg = pickPraiseMessage(quiz.correctStreak);
+  } else {
+    quiz.correctStreak = 0;
+  }
+
   if(state.view === "quiz"){
     submitQuizAnswer(isCorrect, q);
   } else if(state.view === "practice"){
@@ -2250,6 +2305,7 @@ function handleDontKnow(){
 
   quiz.answered = true;
   quiz.dontKnow = true;
+  quiz.correctStreak = 0;
 
   if(state.view === "quiz"){
     submitQuizAnswer(false, q, true);
@@ -2268,7 +2324,8 @@ var askState = {
   draft: "",
   messages: [],   // {role:'user'|'bot'|'error', text}
   authError: "",
-  loginDraft: {username:"", password:""}
+  loginDraft: {username:"", password:""},
+  selectedTopicId: "current" // "current" = the topic of the last-answered question (default) | a TOPICS id | "other"
 };
 
 function getAskAuth(){
@@ -2285,6 +2342,14 @@ function clearAskAuth(){
 }
 
 function activityContextSummary(){
+  var mode = askState.selectedTopicId || "current";
+  if(mode === "other"){
+    return "בחרת 'נושא אחר' — מה תרצי לברר?";
+  }
+  if(mode !== "current"){
+    var t = getTopic(mode);
+    return "השאלה תתייחס לנושא שבחרת: \"" + (t ? t.title : "") + "\".";
+  }
   var a = state.lastActivity;
   if(!a) return "עדיין לא נענתה שאלה בהרצה הזו — אפשר לשאול כל שאלה כללית בנושאי 4 יחידות.";
   var line = "בהקשר לשאלה האחרונה בנושא \"" + a.topicTitle + "\"" + (a.wasDontKnow ? " (סומנה כ'לא ידע/ה לפתור')" : (a.wasCorrect ? " (נענתה נכון)" : " (נענתה לא נכון)")) + ".";
@@ -2303,6 +2368,25 @@ function buildAskContextPayload(){
     wasDontKnow: a.wasDontKnow,
     fullSolutionShown: a.fullSolution
   };
+}
+
+function buildTopicSelectOptions(){
+  var mode = askState.selectedTopicId || "current";
+  var currentLabel = state.lastActivity ? state.lastActivity.topicTitle : "כללי";
+  var html = '<option value="current"' + (mode==="current"?' selected':'') + '>🔹 הנושא הנוכחי (' + esc(currentLabel) + ')</option>';
+  TOPICS.filter(function(t){ return t.active; }).forEach(function(t){
+    html += '<option value="' + t.id + '"' + (mode===t.id?' selected':'') + '>' + esc(t.title) + '</option>';
+  });
+  html += '<option value="other"' + (mode==="other"?' selected':'') + '>➕ נושא אחר</option>';
+  return html;
+}
+
+function resolveAskTopicContext(){
+  var mode = askState.selectedTopicId || "current";
+  if(mode === "current") return buildAskContextPayload();
+  if(mode === "other") return { topicTitle: "נושא אחר (לפי בחירת התלמידה)" };
+  var t = getTopic(mode);
+  return { topicTitle: t ? t.title : "" };
 }
 
 function toggleAskPanel(forceState){
@@ -2354,13 +2438,16 @@ function renderAskPanel(){
     msgsHtml += '<div class="ask-msg ask-msg-loading">חושב/ת על תשובה מדויקת...</div>';
   }
 
+  var textareaPlaceholder = (askState.selectedTopicId === "other") ? "מה תרצי לברר?" : "כתבי כאן את השאלה שלך...";
+
   panel.innerHTML =
     '<div class="ask-panel-header"><h3>💬 שאלה נוספת</h3><button class="ask-panel-close" data-action="toggle-ask-panel">✕</button></div>' +
+    '<div class="ask-panel-topic-select"><label for="askTopicSelect">📚 נושא:</label><select id="askTopicSelect">' + buildTopicSelectOptions() + '</select></div>' +
     '<div class="ask-panel-context">' + esc(activityContextSummary()) + '</div>' +
     '<div class="ask-panel-disclaimer">⚠️ התשובות נוצרות על ידי בינה מלאכותית. המודל מונחה לענות רק כשהוא בטוח ולא להמציא נוסחאות, אך מומלץ לוודא תשובות חשובות מול המורה או הפתרון הרשמי.</div>' +
     '<div class="ask-panel-messages" id="askMessagesEl">' + msgsHtml + '</div>' +
     '<div class="ask-panel-footer">' +
-      '<textarea id="askQuestionInput" placeholder="כתבי כאן את השאלה שלך..." ' + (askState.loading ? "disabled" : "") + '>' + esc(askState.draft) + '</textarea>' +
+      '<textarea id="askQuestionInput" placeholder="' + textareaPlaceholder + '" ' + (askState.loading ? "disabled" : "") + '>' + esc(askState.draft) + '</textarea>' +
       '<button data-action="ask-send" ' + (askState.loading ? "disabled" : "") + '>שלח/י</button>' +
     '</div>';
 
@@ -2400,7 +2487,7 @@ function sendAskQuestion(){
 
   var payload = {
     question: question,
-    context: buildAskContextPayload(),
+    context: resolveAskTopicContext(),
     username: auth.username,
     password: auth.password
   };
