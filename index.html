@@ -153,7 +153,7 @@
   .explain-block h4{margin:0 0 6px;font-size:0.95rem;}
   .formula{
     background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 14px;
-    font-family: "Cambria Math", Cambria, Georgia, serif; direction:ltr; text-align:center; margin:8px 0;
+    font-family: "Cambria Math", Cambria, Georgia, serif; direction:rtl; text-align:center; margin:8px 0;
   }
   .video-links a{display:block;margin-bottom:6px;font-size:0.9rem;}
   .mistakes-list li{margin-bottom:6px;}
@@ -1835,6 +1835,34 @@ function esc(s){
   return d.innerHTML;
 }
 
+/* ======================= Bidi-safe rendering for mixed Hebrew/math text =======================
+   Hebrew (RTL) text that has math/Latin snippets embedded in it (e.g. "לציר ה-x", "f'(x) = 2x - 4")
+   can visually reorder incorrectly, since the browser's bidi algorithm may reposition an embedded
+   LTR run relative to the surrounding RTL sentence. escBidi() finds every such embedded run and
+   wraps it in <bdi dir="ltr">, isolating it so it always reads left-to-right in its correct place
+   in the sentence, regardless of the RTL text around it. Use this (instead of plain esc()) for any
+   Hebrew text that may contain embedded math/Latin content. Do NOT use it inside HTML attribute
+   values (e.g. value="...") or inside <textarea> content — bdi is an element and only belongs in
+   text content, never in an attribute string or in <textarea>'s literal text.
+*/
+var BIDI_CORE = "A-Za-z\\u0370-\\u03FF0-9\\u00B2\\u00B3\\u00B9\\u2070-\\u209F";
+var BIDI_SYM = "∫∑∏√±≠≤≥→←↔∩∪⊂⊃⊆⊇∈∉∀∃¬∧∨⇒⇔∞";
+var BIDI_OPEN = "(\\[{";
+var BIDI_CLOSE = ")\\]}";
+var BIDI_MID = BIDI_CORE + "+\\-*/^=<>" + BIDI_OPEN + BIDI_CLOSE + BIDI_SYM + ".,:;'\"·⋅×÷≈~|_%°!\\u2212\\u2013\\u2014 ";
+var BIDI_START = BIDI_CORE + BIDI_OPEN + BIDI_SYM;
+var BIDI_END = BIDI_CORE + BIDI_CLOSE + "%°!";
+var BIDI_RUN_RE = new RegExp("[" + BIDI_START + "][" + BIDI_MID + "]*[" + BIDI_END + "]|[" + BIDI_CORE + "]", "g");
+var BIDI_QUALIFY_RE = new RegExp("[A-Za-z\\u0370-\\u03FF+\\-*/^=<>" + BIDI_OPEN + BIDI_SYM + "'\"·⋅×÷≈~|_%\\u2212\\u2013\\u2014\\u2070-\\u209F\\u00B2\\u00B3\\u00B9]");
+
+function escBidi(s){
+  var escaped = esc(s);
+  return escaped.replace(BIDI_RUN_RE, function(run){
+    if(!BIDI_QUALIFY_RE.test(run)) return run; // pure digits/spaces/plain punctuation - leave untouched
+    return '<bdi dir="ltr">' + run + '</bdi>';
+  });
+}
+
 function overallStats(){
   var active = activeTopics();
   var mastered=0, inProgress=0, notStarted=0;
@@ -1866,8 +1894,8 @@ function renderDashboard(){
         topicIconChip(t) +
         '<div class="topic-card-body">' +
         '<div class="topic-week">בקרוב</div>' +
-        '<h3>' + esc(t.title) + '</h3>' +
-        '<p style="color:var(--text-dim);font-size:0.85rem;margin:0;">' + esc(t.short) + '</p>' +
+        '<h3>' + escBidi(t.title) + '</h3>' +
+        '<p style="color:var(--text-dim);font-size:0.85rem;margin:0;">' + escBidi(t.short) + '</p>' +
         '<span class="status-badge status-soon">בפיתוח</span>' +
         '</div></div>';
     }
@@ -1878,9 +1906,9 @@ function renderDashboard(){
     return '<div class="topic-card" style="--icon-color:' + t.accent + ';" data-action="open-topic" data-topic="' + t.id + '">' +
       topicIconChip(t) +
       '<div class="topic-card-body">' +
-      (t.week ? '<div class="topic-week">' + esc(t.week) + '</div>' : '') +
-      '<h3>' + esc(t.title) + '</h3>' +
-      '<p style="color:var(--text-dim);font-size:0.85rem;margin:0;">' + esc(t.short) + '</p>' +
+      (t.week ? '<div class="topic-week">' + escBidi(t.week) + '</div>' : '') +
+      '<h3>' + escBidi(t.title) + '</h3>' +
+      '<p style="color:var(--text-dim);font-size:0.85rem;margin:0;">' + escBidi(t.short) + '</p>' +
       '<span class="status-badge ' + statusClass + '">' + statusLabel + '</span>' +
       (scoreLabel ? '<div class="score-pill">ציון אחרון במבחן נושא: ' + scoreLabel + '</div>' : '') +
       '</div></div>';
@@ -1949,19 +1977,19 @@ function renderTopicDetail(topicId){
   var explainHtml = "";
   if(t.explain){
     explainHtml = '<div class="explain-block">' +
-      '<h4>מה זה אומר</h4><p>' + esc(t.explain.whatIsIt) + '</p>' +
+      '<h4>מה זה אומר</h4><p>' + escBidi(t.explain.whatIsIt) + '</p>' +
       '<h4>הנוסחאות המרכזיות</h4>' +
-      t.explain.formulas.map(function(f){return '<div class="formula">'+esc(f)+'</div>';}).join("") +
-      '<h4>דוגמה מלאה</h4><p style="white-space:pre-wrap;">' + esc(t.explain.example) + '</p>' +
+      t.explain.formulas.map(function(f){return '<div class="formula">'+escBidi(f)+'</div>';}).join("") +
+      '<h4>דוגמה מלאה</h4><p style="white-space:pre-wrap;">' + escBidi(t.explain.example) + '</p>' +
       '<h4>טעויות נפוצות</h4><ul class="mistakes-list">' +
-      t.explain.mistakes.map(function(m){return '<li>'+esc(m)+'</li>';}).join("") + '</ul>' +
+      t.explain.mistakes.map(function(m){return '<li>'+escBidi(m)+'</li>';}).join("") + '</ul>' +
       '</div>';
   }
 
   var videosHtml = "";
   if(t.videos && t.videos.length){
     videosHtml = '<div class="card"><h3>סרטוני הדרכה</h3><div class="video-links">' +
-      t.videos.map(function(v){return '<a href="'+esc(v.url)+'" target="_blank" rel="noopener">▶ '+esc(v.label)+'</a>';}).join("") +
+      t.videos.map(function(v){return '<a href="'+esc(v.url)+'" target="_blank" rel="noopener">▶ '+escBidi(v.label)+'</a>';}).join("") +
       '</div></div>';
   }
 
@@ -1976,12 +2004,12 @@ function renderTopicDetail(topicId){
   }
 
   return '' +
-    '<div class="breadcrumb"><span data-action="go-dashboard">לוח הבקרה</span> ← ' + esc(t.title) + '</div>' +
+    '<div class="breadcrumb"><span data-action="go-dashboard">לוח הבקרה</span> ← ' + escBidi(t.title) + '</div>' +
     '<div class="row" style="align-items:center;gap:14px;margin-bottom:2px;">' +
       topicIconChip(t) +
-      '<div><h1 style="margin-bottom:0;">' + esc(t.title) + (t.week ? ' <span style="font-size:0.9rem;color:var(--text-dim);font-weight:400;">(' + esc(t.week) + ')</span>' : '') + '</h1></div>' +
+      '<div><h1 style="margin-bottom:0;">' + escBidi(t.title) + (t.week ? ' <span style="font-size:0.9rem;color:var(--text-dim);font-weight:400;">(' + escBidi(t.week) + ')</span>' : '') + '</h1></div>' +
     '</div>' +
-    '<p class="subtitle">' + esc(t.short) + '</p>' +
+    '<p class="subtitle">' + escBidi(t.short) + '</p>' +
     explainHtml +
     videosHtml +
     '<div class="row" style="margin:16px 0;">' +
@@ -1999,14 +2027,14 @@ function renderStepByStepExplanation(q){
   for(var i=0; i<q.hints.length; i++){
     var isLast = i === q.hints.length - 1;
     var label = isLast ? "הפתרון המלא:" : ("שלב " + (i+1) + ":");
-    out += '<div class="hint-box' + (isLast ? " hint-final" : "") + '"><span class="hint-step-label">' + label + '</span>' + esc(q.hints[i]) + '</div>';
+    out += '<div class="hint-box' + (isLast ? " hint-final" : "") + '"><span class="hint-step-label">' + label + '</span>' + escBidi(q.hints[i]) + '</div>';
   }
   return out;
 }
 
 function renderQuestionCommon(q, quizStateObj, opts){
   // opts: {onSubmit, onNext, showHintButton, footerExtra}
-  var body = '<div class="question-stem">' + esc(q.stem) + '</div>';
+  var body = '<div class="question-stem">' + escBidi(q.stem) + '</div>';
 
   if(q.type === "mc"){
     body += '<div class="choices">';
@@ -2018,7 +2046,7 @@ function renderQuestionCommon(q, quizStateObj, opts){
       } else if(i === quizStateObj.selected){
         cls += " selected";
       }
-      body += '<div class="' + cls + '" data-action="select-choice" data-index="' + i + '">' + esc(choice) + '</div>';
+      body += '<div class="' + cls + '" data-action="select-choice" data-index="' + i + '">' + escBidi(choice) + '</div>';
     });
     body += '</div>';
   } else {
@@ -2047,10 +2075,10 @@ function renderQuestionCommon(q, quizStateObj, opts){
     } else {
       var isCorrect = q.type==="mc" ? quizStateObj.selected === q.correctIndex : checkNumeric(quizStateObj.selected, q.correctValue, q.tolerance);
       body += '<div class="feedback-box ' + (isCorrect ? "feedback-correct" : "feedback-incorrect") + '">' +
-        (isCorrect ? ("✔ " + esc(quizStateObj.lastPraiseMsg || "נכון!")) : ("✘ לא מדויק. " + (q.type==="numeric" ? ("התשובה הנכונה: " + fmtNum(q.correctValue)) : ""))) +
+        (isCorrect ? ("✔ " + escBidi(quizStateObj.lastPraiseMsg || "נכון!")) : ("✘ לא מדויק. " + (q.type==="numeric" ? ("התשובה הנכונה: " + fmtNum(q.correctValue)) : ""))) +
         '</div>';
       if(isCorrect){
-        body += '<div class="hint-box">' + esc(q.hints[q.hints.length-1]) + '</div>';
+        body += '<div class="hint-box">' + escBidi(q.hints[q.hints.length-1]) + '</div>';
       } else {
         body += '<div class="explain-heading">💡 בואי נראה יחד איך מגיעים לפתרון הנכון, שלב אחר שלב:</div>';
         body += renderStepByStepExplanation(q);
@@ -2060,7 +2088,7 @@ function renderQuestionCommon(q, quizStateObj, opts){
     // hint progression (only outside strict test modes if allowed)
     if(opts.showHintButton){
       for(var h=0; h<quizStateObj.revealed; h++){
-        body += '<div class="hint-box">' + esc(q.hints[h]) + '</div>';
+        body += '<div class="hint-box">' + escBidi(q.hints[h]) + '</div>';
       }
       if(quizStateObj.revealed < q.hints.length){
         body += '<div class="row" style="margin-top:8px;"><button class="btn-ghost" data-action="reveal-hint">💡 ' + (quizStateObj.revealed===0? "רמז" : "רמז נוסף") + '</button></div>';
@@ -2090,8 +2118,8 @@ function renderPractice(){
   footer += '<button class="btn-secondary" data-action="go-topic" data-topic="' + quiz.topicId + '">סיום תרגול וחזרה לנושא</button>';
   footer += '</div>';
 
-  return '<div class="breadcrumb"><span data-action="go-dashboard">לוח הבקרה</span> ← <span data-action="go-topic" data-topic="' + quiz.topicId + '">' + esc(t.title) + '</span> ← תרגול</div>' +
-    '<div class="quiz-header"><span>תרגול חופשי — ' + esc(t.title) + '</span><span>שאלה מס׳ ' + (quiz.index+1) + '</span></div>' +
+  return '<div class="breadcrumb"><span data-action="go-dashboard">לוח הבקרה</span> ← <span data-action="go-topic" data-topic="' + quiz.topicId + '">' + escBidi(t.title) + '</span> ← תרגול</div>' +
+    '<div class="quiz-header"><span>תרגול חופשי — ' + escBidi(t.title) + '</span><span>שאלה מס׳ ' + (quiz.index+1) + '</span></div>' +
     '<div class="card">' + body + footer + '</div>';
 }
 
@@ -2121,7 +2149,7 @@ function renderQuiz(){
   var pct = Math.round((quiz.index)/quiz.questions.length*100);
   var barColor = (quiz.mode === "topic-test" && t) ? t.accent : "var(--primary)";
 
-  return '<div class="quiz-header"><span>' + esc(titleMap[quiz.mode] || "מבחן") + (quiz.mode==="topic-test" && t ? (" — " + esc(t.title)) : "") + '</span><span>שאלה ' + (quiz.index+1) + ' מתוך ' + quiz.questions.length + '</span></div>' +
+  return '<div class="quiz-header"><span>' + esc(titleMap[quiz.mode] || "מבחן") + (quiz.mode==="topic-test" && t ? (" — " + escBidi(t.title)) : "") + '</span><span>שאלה ' + (quiz.index+1) + ' מתוך ' + quiz.questions.length + '</span></div>' +
     '<div class="quiz-progress-outer"><div class="quiz-progress-inner" style="width:' + pct + '%;background:' + barColor + ';"></div></div>' +
     '<div class="card">' + body + footer + '</div>';
 }
@@ -2146,7 +2174,7 @@ function renderQuizResult(){
     var tag = topicWeaknessTag(pctT, hasData, hasData ? tp.dontKnow : 0, hasData ? tp.total : 0);
     var dontKnowNote = (hasData && tp.dontKnow) ? (' · ' + tp.dontKnow + ' סומנו "לא יודע/ת"') : '';
     return '<div class="result-topic-row">' +
-      '<span>' + esc(t.title) + (hasData ? (' — ' + tp.correct + '/' + tp.total + dontKnowNote) : '') + '</span>' +
+      '<span>' + escBidi(t.title) + (hasData ? (' — ' + tp.correct + '/' + tp.total + dontKnowNote) : '') + '</span>' +
       '<span class="tag ' + tag.cls + '">' + tag.label + '</span>' +
       '</div>';
   }).join("");
@@ -2214,7 +2242,7 @@ function renderProgress(){
     var points = attempts.map(function(a,i){
       return {label:"מבחן " + (i+1) + " — " + new Date(a.date).toLocaleDateString("he-IL"), value:(a.correct/a.total)*100};
     });
-    return '<div class="card"><h3>' + esc(t.title) + '</h3>' + buildChartSvg(points, 600, 140, "#3457d5") + '</div>';
+    return '<div class="card"><h3>' + escBidi(t.title) + '</h3>' + buildChartSvg(points, 600, 140, "#3457d5") + '</div>';
   }).join("");
 
   return '' +
@@ -2485,7 +2513,7 @@ function renderAskPanel(){
   } else {
     askState.messages.forEach(function(m){
       var cls = m.role === "user" ? "ask-msg-user" : (m.role === "error" ? "ask-msg-error" : "ask-msg-bot");
-      msgsHtml += '<div class="ask-msg ' + cls + '">' + esc(m.text) + '</div>';
+      msgsHtml += '<div class="ask-msg ' + cls + '">' + escBidi(m.text) + '</div>';
     });
   }
   if(askState.loading){
@@ -2497,7 +2525,7 @@ function renderAskPanel(){
   panel.innerHTML =
     '<div class="ask-panel-header"><h3>💬 שאלה נוספת</h3><button class="ask-panel-close" data-action="toggle-ask-panel">✕</button></div>' +
     '<div class="ask-panel-topic-select"><label for="askTopicSelect">📚 נושא:</label><select id="askTopicSelect">' + buildTopicSelectOptions() + '</select></div>' +
-    '<div class="ask-panel-context">' + esc(activityContextSummary()) + '</div>' +
+    '<div class="ask-panel-context">' + escBidi(activityContextSummary()) + '</div>' +
     '<div class="ask-panel-disclaimer">⚠️ התשובות נוצרות על ידי בינה מלאכותית. המודל מונחה לענות רק כשהוא בטוח ולא להמציא נוסחאות, אך מומלץ לוודא תשובות חשובות מול המורה או הפתרון הרשמי.</div>' +
     '<div class="ask-panel-messages" id="askMessagesEl">' + msgsHtml + '</div>' +
     '<div class="ask-panel-footer">' +
